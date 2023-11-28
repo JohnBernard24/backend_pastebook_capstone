@@ -17,7 +17,7 @@ namespace backend_pastebook_capstone.Repository
 			return _context.Photo.FirstOrDefault(p => p.Id == photoId);
 		}
 
-		public Photo? GetFirstPhotoForAlbum(Guid albumId)
+		public Photo? GetFirstPhotoForAlbum(Guid? albumId)
 		{
 			return _context.Photo
 				.Where(photo => photo.AlbumId == albumId)

@@ -12,12 +12,12 @@ namespace backend_pastebook_capstone.Repository
 			_context = context;
 		}
 
-		public Album? GetAlbumByAlbumId(Guid albumId)
+		public Album? GetAlbumByAlbumId(Guid? albumId)
 		{
 			return _context.Album.FirstOrDefault(a => a.Id == albumId);
 		}
 
-		public List<Album> GetAllAlbumsByUserId(Guid userId)
+		public List<Album> GetAlbumsListByUserId(Guid userId)
 		{
 			return _context.Album.Where(a => a.UserId == userId).ToList();
 		}
