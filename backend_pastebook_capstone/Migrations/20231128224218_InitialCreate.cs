@@ -95,8 +95,7 @@ namespace backend_pastebook_capstone.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false),
-                    RecieverId = table.Column<Guid>(type: "char(36)", nullable: false),
-                    ReceieverId = table.Column<Guid>(type: "char(36)", nullable: true),
+                    ReceiverId = table.Column<Guid>(type: "char(36)", nullable: false),
                     SenderId = table.Column<Guid>(type: "char(36)", nullable: false),
                     FriendshipDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     IsFriend = table.Column<bool>(type: "tinyint(1)", nullable: false)
@@ -105,10 +104,11 @@ namespace backend_pastebook_capstone.Migrations
                 {
                     table.PrimaryKey("PK_Friend", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Friend_User_ReceieverId",
-                        column: x => x.ReceieverId,
+                        name: "FK_Friend_User_ReceiverId",
+                        column: x => x.ReceiverId,
                         principalTable: "User",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Friend_User_SenderId",
                         column: x => x.SenderId,
@@ -265,9 +265,9 @@ namespace backend_pastebook_capstone.Migrations
                 column: "PostId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Friend_ReceieverId",
+                name: "IX_Friend_ReceiverId",
                 table: "Friend",
-                column: "ReceieverId");
+                column: "ReceiverId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Friend_SenderId",
