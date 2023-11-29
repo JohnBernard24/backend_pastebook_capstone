@@ -144,7 +144,7 @@ namespace backend_pastebook_capstone.Controllers
 		}
 
 		[HttpPost("verify-email/{recipientEmail}")]
-		public async Task<IActionResult> SendEmail(string recipientEmail)
+		public IActionResult SendEmail(string recipientEmail)
 		{
 			var senderEmail = "teametivacpastebook@gmail.com";
 			var senderPassword = "nbci cmzt wqds krbv";
@@ -229,7 +229,7 @@ namespace backend_pastebook_capstone.Controllers
 
 			try
 			{
-				await smtpClient.SendMailAsync(message);
+				smtpClient.SendMailAsync(message);
 				return Ok(new { result = "Email sent successfully!" });
 			}
 			catch (Exception)
