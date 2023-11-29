@@ -208,29 +208,20 @@ namespace backend_pastebook_capstone.Controllers
 		public IActionResult LikePost([FromBody] LikeDTO likeDTO)
 		{
 			string? token = Request.Headers["Authorization"];
-
 			if (token == null || _userRepository.GetUserByToken(token) == null)
-			{
 				return BadRequest(new { result = "no_valid_token_sent" });
-			}
 
 			if (!ModelState.IsValid)
-			{
 				return BadRequest(new { result = "invalid_like_to_post" });
-			}
 
 			Post? post = _postRepository.GetPostByPostId(likeDTO.PostId);
 			if (post == null)
-			{
 				return NotFound(new { result = "post_not_found" });
-			}
 
 			User? liker = _userRepository.GetUserById(likeDTO.LikerId);
 
 			if (liker == null)
-			{
 				return NotFound(new { result = "liker_not_found" });
-			}
 
 			Like? existingLike = _postRepository.GetLikeByPostIdAndUserId(likeDTO.PostId, likeDTO.LikerId);
 
