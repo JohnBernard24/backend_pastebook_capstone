@@ -13,7 +13,7 @@ namespace backend_pastebook_capstone.Repository
 			_context = context;
 		}
 
-		public List<Notification> GetAllNotificationByUserId(Guid userId)
+		public List<Notification> GetNotificationListByUserId(Guid userId)
 		{
 			return _context.Notification.Where(n => n.NotifiedUserId == userId)
 				.Include(n => n.NotifiedUser)
@@ -54,6 +54,12 @@ namespace backend_pastebook_capstone.Repository
 		public void AddNotification(Notification notification)
 		{
 			_context.Notification.Add(notification);
+			_context.SaveChanges();
+		}
+
+		public void UpdateNotification(Notification notification)
+		{
+			_context.Notification.Update(notification);
 			_context.SaveChanges();
 		}
 

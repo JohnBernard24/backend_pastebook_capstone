@@ -13,5 +13,16 @@
 		public bool IsRead { get; set; } = false;
 	}
 
-	
+	public class NotificationDTO
+	{
+		public Guid? Id { get; set; }
+		public Guid NotifiedUserId { get; set; }
+		public MiniProfileDTO? NotifiedUser { get; set; }
+		public string NotificationType { get; set; } = null!;
+		public Guid ContextId { get; set; }
+		public bool IsRead { get; set; }
+
+	}
+
+
 }
