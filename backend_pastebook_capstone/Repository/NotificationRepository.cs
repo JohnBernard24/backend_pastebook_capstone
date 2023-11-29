@@ -40,9 +40,15 @@ namespace backend_pastebook_capstone.Repository
 			return _context.Comment.Include(c => c.Post).Include(c => c.Commenter).FirstOrDefault(c => c.Id == contextId);
 		}
 
-		public Friend? GetFriendRequestByContextId(Guid contextId)
+		public Friend? GetSentFriendRequestByContextId(Guid contextId)
 		{
 			return _context.Friend.Include(f => f.Sender).FirstOrDefault(f => f.Id == contextId);
+		}
+
+		// following function is to be used when accessing the notification that says "___ has accepted your friend request
+		public Friend? GetAcceptedFriendRequestByContextId(Guid contextId)
+		{
+			return _context.Friend.Include(f => f.Receiver).FirstOrDefault(f => f.Id == contextId);
 		}
 
 		public void AddNotification(Notification notification)

@@ -251,8 +251,7 @@ namespace backend_pastebook_capstone.Controllers
 					NotificationType = "like",
 					NotifiedUserId = post.PosterId,
 					NotifiedUser = post.Poster,
-					ContextId = like.Id,
-					IsRead = false
+					ContextId = like.Id
 				};
 
 				_notificationRepository.AddNotification(likeNotif);

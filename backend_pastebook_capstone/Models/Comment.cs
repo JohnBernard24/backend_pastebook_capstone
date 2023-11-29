@@ -11,4 +11,15 @@
 		public Guid CommenterId { get; set; }
 		public User? Commenter { get; set; }
 	}
+
+	public class CommentDTO
+	{
+		public Guid? Id { get; set; }
+		public string CommentContent { get; set; } = null!;
+		public DateTime DateCommented { get; set; } = DateTime.Now;
+
+		public Guid PostId { get; set; }
+
+		public Guid CommenterId { get; set; }
+	}
 }
