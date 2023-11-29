@@ -1,5 +1,6 @@
 ﻿using backend_pastebook_capstone.Data;
 using backend_pastebook_capstone.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend_pastebook_capstone.Repository
 {

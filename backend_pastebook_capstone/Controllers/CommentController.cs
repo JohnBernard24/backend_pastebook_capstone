@@ -87,6 +87,8 @@ namespace backend_pastebook_capstone.Controllers
 			_commentRepository.UpdateComment(existingComment);
 
 			commentDTO.DateCommented = existingComment.DateCommented;
+			commentDTO.PostId = existingComment.PostId;
+			commentDTO.CommenterId = existingComment.CommenterId;
 
 			return Ok(commentDTO);
 		}

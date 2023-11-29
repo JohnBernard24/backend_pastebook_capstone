@@ -62,12 +62,36 @@ namespace backend_pastebook_capstone.Models
 	public class MiniProfileDTO
 	{
 		public Guid? Id { get; set; }
+		[Required]
 		public string FirstName { get; set; } = null!;
+		[Required]
 		public string LastName { get; set; } = null!;
 		public Photo? Photo { get; set; }
 		public int? FriendCount { get; set; }
 	}
 
+	public class ProfileDTO
+	{
+		public Guid? Id { get; set; }
+		[Required]
+		public string FirstName { get; set; } = null!;
+		[Required]
+		public string LastName { get; set; } = null!;
+		[Required]
+		public DateTime BirthDate { get; set; }
+
+		public string? Sex { get; set; }
+
+		public string? PhoneNumber { get; set; }
+
+		public string? AboutMe { get; set; }
+	}
+
+	public class EditPasswordDTO
+	{
+		public string CurrentPassword { get; set; } = null!;
+		public string NewPassword { get; set; } = null!;
+	}
 
 
 }

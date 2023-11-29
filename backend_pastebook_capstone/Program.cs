@@ -59,7 +59,7 @@ namespace backend_pastebook_capstone
 			builder.Services.AddScoped<UserRepository>();
 			builder.Services.AddScoped<PostRepository>();
 			builder.Services.AddScoped<TimelineRepository>();
-			/*builder.Services.AddScoped<CommentRepository>();*/
+			builder.Services.AddScoped<CommentRepository>();
 			builder.Services.AddScoped<FriendRepository>();
 			builder.Services.AddScoped<NotificationRepository>();
 			builder.Services.AddScoped<AlbumRepository>();
