@@ -8,13 +8,15 @@ namespace backend_pastebook_capstone.Repository
 	public class UserRepository
 	{
 		public readonly CapstoneDBContext _context;
+		public readonly TimelineRepository _timelineRepository;
 
-		public UserRepository(CapstoneDBContext context)
+		public UserRepository(CapstoneDBContext context, TimelineRepository timelineRepository)
 		{
 			_context = context;
+			_timelineRepository = timelineRepository;
 		}
 
-		public User? GetUserById(Guid id)
+		public User? GetUserById(Guid? id)
 		{
 			return _context.User.FirstOrDefault(x => x.Id == id);
 		}
@@ -31,6 +33,14 @@ namespace backend_pastebook_capstone.Repository
 
 			User? user = _context.User.FirstOrDefault(u => u.Id == accessToken.UserId);
 			return user;
+		}
+
+		public User? GetUserByTimelineId(Guid timelineId)
+		{
+			Timeline? timeline = _timelineRepository.GetTimelineByTimelineId(timelineId);
+			if(timeline == null)
+				return null;
+			return _context.User.FirstOrDefault(u => u.Id == timeline.UserId);
 		}
 
 		public List<User> GetUserBySearchName(string name)

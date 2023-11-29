@@ -11,7 +11,7 @@ using backend_pastebook_capstone.Data;
 namespace backend_pastebook_capstone.Migrations
 {
     [DbContext(typeof(CapstoneDBContext))]
-    [Migration("20231128164638_InitialCreate")]
+    [Migration("20231128224218_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -99,10 +99,7 @@ namespace backend_pastebook_capstone.Migrations
                     b.Property<bool>("IsFriend")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<Guid?>("ReceieverId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("RecieverId")
+                    b.Property<Guid>("ReceiverId")
                         .HasColumnType("char(36)");
 
                     b.Property<Guid>("SenderId")
@@ -110,7 +107,7 @@ namespace backend_pastebook_capstone.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ReceieverId");
+                    b.HasIndex("ReceiverId");
 
                     b.HasIndex("SenderId");
 
@@ -322,9 +319,11 @@ namespace backend_pastebook_capstone.Migrations
 
             modelBuilder.Entity("backend_pastebook_capstone.Models.Friend", b =>
                 {
-                    b.HasOne("backend_pastebook_capstone.Models.User", "Receiever")
+                    b.HasOne("backend_pastebook_capstone.Models.User", "Receiver")
                         .WithMany()
-                        .HasForeignKey("ReceieverId");
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("backend_pastebook_capstone.Models.User", "Sender")
                         .WithMany()
@@ -332,7 +331,7 @@ namespace backend_pastebook_capstone.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Receiever");
+                    b.Navigation("Receiver");
 
                     b.Navigation("Sender");
                 });

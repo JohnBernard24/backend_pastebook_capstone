@@ -39,20 +39,21 @@ namespace backend_pastebook_capstone.Controllers
 				return BadRequest(new { result = "invalid_post" });
 			}
 
-			User? poster = _userRepository.GetUserById(postDTO.PosterId);
+			//This gets the poster via its token bc the one logged in is the one who posted
+			User? poster = _userRepository.GetUserByToken(token);
 			if(poster == null)
 			{
 				return BadRequest(new { result = "invalid_user_id" });
 			}
 
-			User? user = _userRepository.GetUserByToken(token);
+			//This is the one who posted on, and the succeeding timeline is their timeline
+			User? user = _userRepository.GetUserById(postDTO.UserId);
 			if (user == null)
 				return BadRequest(new { result = "user_not_found" });
 
-			Timeline? timeline = _timelineRepository.GetTimelineByUserId(user.Id);
+			Timeline? timeline = _timelineRepository.GetTimelineByUserId(postDTO.UserId);
 			if (timeline == null)
 				return BadRequest(new { result = "user_not_found" });
-
 
 			Photo? photo = _photoRepository.GetPhotoByPhotoId(postDTO.PhotoId);
 			Post post = new Post
@@ -143,7 +144,7 @@ namespace backend_pastebook_capstone.Controllers
 			{
 				return BadRequest(new { result = "post_not_found" });
 			}
-			
+		
 			PostDTO postDTO = new PostDTO
 			{
 				Id = post.Id,
@@ -151,6 +152,7 @@ namespace backend_pastebook_capstone.Controllers
 				PostBody = post.PostBody,
 				DatePosted = post.DatePosted,
 				PhotoId = post.PhotoId,
+				UserId = _userRepository.GetUserByTimelineId(post.TimelineId)?.Id,
 				PosterId = post.PosterId,
 			};
 
@@ -249,8 +251,7 @@ namespace backend_pastebook_capstone.Controllers
 					NotificationType = "like",
 					NotifiedUserId = post.PosterId,
 					NotifiedUser = post.Poster,
-					ContextId = like.Id,
-					IsRead = false
+					ContextId = like.Id
 				};
 
 				_notificationRepository.AddNotification(likeNotif);

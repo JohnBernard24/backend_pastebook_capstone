@@ -13,7 +13,7 @@ namespace backend_pastebook_capstone.Repository
 			_context = context;
 		}
 
-		public Timeline? GetTimelineByUserId(Guid userId)
+		public Timeline? GetTimelineByUserId(Guid? userId)
 		{
 			return _context.TimeLine.FirstOrDefault(t => t.UserId == userId);
 		}
@@ -26,6 +26,11 @@ namespace backend_pastebook_capstone.Repository
 				.Include(post => post.Timeline)
 				.Include(post => post.Photo)
 				.ToList();
+		}
+
+		public Timeline? GetTimelineByTimelineId(Guid timelineId)
+		{
+			return _context.TimeLine.FirstOrDefault(t => t.Id == timelineId);
 		}
 
 		public void AddTimeline(Timeline timeline)

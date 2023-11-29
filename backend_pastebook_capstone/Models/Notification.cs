@@ -10,7 +10,7 @@
 		public DateTime NotifiedDate { get; set; } = DateTime.Now;
 
 		public Guid ContextId { get; set; }
-		public bool IsRead { get; set; }
+		public bool IsRead { get; set; } = false;
 	}
 
 	

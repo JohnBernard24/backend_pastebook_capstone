@@ -3,8 +3,8 @@
 	public class Friend
 	{
 		public Guid Id { get; set; }
-		public Guid RecieverId { get; set; }
-		public User? Receiever { get; set; }
+		public Guid ReceiverId { get; set; }
+		public User? Receiver { get; set; }
 		public Guid SenderId { get; set; }
 		public User? Sender { get; set; }
 		public DateTime? FriendshipDate { get; set; }
