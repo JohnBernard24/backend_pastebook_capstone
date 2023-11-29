@@ -1,6 +1,7 @@
 ﻿using backend_pastebook_capstone.Data;
 using backend_pastebook_capstone.Models;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Protocol.Plugins;
 
 namespace backend_pastebook_capstone.Repository
 {
@@ -64,6 +65,15 @@ namespace backend_pastebook_capstone.Repository
 					(f.SenderId == senderId && f.ReceiverId == receiverId) ||
 					(f.SenderId == receiverId && f.ReceiverId == senderId)
 				);
+		}
+
+		public Friend? GetFriendByCurrentUserAndUserToRemoveId(Guid currentUserId, Guid userToRemoveId)
+		{
+			return _context.Friend
+				.FirstOrDefault(f =>
+				(f.SenderId == currentUserId && f.ReceiverId == userToRemoveId) ||
+				(f.SenderId == userToRemoveId && f.ReceiverId == currentUserId)
+			);
 		}
 
 		public Friend? GetFriendRequestByFriendId(Guid requestId)

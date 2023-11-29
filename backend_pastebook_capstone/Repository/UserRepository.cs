@@ -43,7 +43,7 @@ namespace backend_pastebook_capstone.Repository
 			return _context.User.FirstOrDefault(u => u.Id == timeline.UserId);
 		}
 
-		public List<User> GetUserBySearchName(string name)
+		public List<User> GetUserListBySearchName(string name)
 		{
 			return _context.User.Where(u => u.FirstName.Contains(name) || u.LastName.Contains(name)).ToList();
 		}

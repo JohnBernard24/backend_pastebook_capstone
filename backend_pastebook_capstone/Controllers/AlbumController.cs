@@ -67,6 +67,7 @@ namespace backend_pastebook_capstone.Controllers
 			_albumRepository.UpdateAlbum(existingAlbum);
 
 			albumDTO.Id = existingAlbum.Id;
+			albumDTO.UserId = existingAlbum.UserId;
 
 			return Ok(albumDTO);
 		}
