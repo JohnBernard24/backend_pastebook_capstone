@@ -67,6 +67,15 @@ namespace backend_pastebook_capstone.Repository
 				);
 		}
 
+		public Friend? FriendExist(Guid senderId, Guid receiverId)
+		{
+			return _context.Friend
+				.FirstOrDefault(f =>
+					(f.SenderId == senderId && f.ReceiverId == receiverId) ||
+					(f.SenderId == receiverId && f.ReceiverId == senderId)
+				);
+		}
+
 		public Friend? GetFriendByCurrentUserAndUserToRemoveId(Guid currentUserId, Guid userToRemoveId)
 		{
 			return _context.Friend
