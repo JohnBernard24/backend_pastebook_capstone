@@ -31,7 +31,7 @@ namespace backend_pastebook_capstone.Repository
 			if (accessToken == null)
 				return null;
 
-			User? user = _context.User.FirstOrDefault(u => u.Id == accessToken.UserId);
+			User? user = _context.User.Include(u => u.Photo).FirstOrDefault(u => u.Id == accessToken.UserId);
 			return user;
 		}
 

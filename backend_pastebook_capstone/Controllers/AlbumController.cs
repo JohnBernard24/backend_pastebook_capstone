@@ -213,6 +213,24 @@ namespace backend_pastebook_capstone.Controllers
 			return Ok(albumsWithFirstPhotoList);
 		}
 
+		[HttpGet("get-uploads-album-id")]
+		public ActionResult<Guid> GetUploadsAlbumId()
+		{
+			string? token = Request.Headers["Authorization"];
+			if (token == null)
+				return BadRequest(new { result = "no_valid_token_sent" });
+
+			User? user = _userRepository.GetUserByToken(token);
+			if (user == null)
+				return BadRequest(new { result = "user_invalid" });
+
+
+			Album? album = _albumRepository.GetUploadsAlbumId(user.Id);
+			if (album == null)
+				return BadRequest(new { result = "no_uploads_album" });
+
+			return album.Id;
+		}
 
 	}
 }

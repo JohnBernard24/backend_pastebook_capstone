@@ -38,6 +38,11 @@ namespace backend_pastebook_capstone.Repository
 		{
 			return _context.Like.FirstOrDefault(l => l.PostId == postId && l.LikerId == likerId);
 		}
+		
+		public bool IsCurrentPostLiked(Guid postId, Guid likerId)
+		{
+			return _context.Like.Any(l => l.PostId == postId && l.LikerId == likerId);
+		}
 
 		public List<Like> GetLikeListByPostId(Guid postId)
 		{

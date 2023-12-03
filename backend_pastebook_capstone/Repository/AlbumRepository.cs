@@ -31,6 +31,11 @@ namespace backend_pastebook_capstone.Repository
 			return _context.Photo.Where(p => p.AlbumId == albumId).ToList();
 		}
 
+		public Album? GetUploadsAlbumId(Guid userId)
+		{
+			return _context.Album.FirstOrDefault(a => a.AlbumName == "Uploads" && a.UserId == userId);
+		}
+
 		public void AddAlbum(Album album)
 		{
 			_context.Album.Add(album);

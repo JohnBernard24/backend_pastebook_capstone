@@ -30,7 +30,7 @@ namespace backend_pastebook_capstone.Models
 
 		public Guid? PhotoId { get; set; }
 		public Guid? UserId { get; set; }
-		public Guid PosterId { get; set; }
+		public Guid? PosterId { get; set; }
 	}
 
 	

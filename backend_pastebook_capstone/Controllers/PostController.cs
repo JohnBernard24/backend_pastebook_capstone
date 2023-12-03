@@ -46,12 +46,18 @@ namespace backend_pastebook_capstone.Controllers
 				return BadRequest(new { result = "invalid_user_id" });
 			}
 
-			//This is the one who posted on, and the succeeding timeline is their timeline
-			User? user = _userRepository.GetUserById(postDTO.UserId);
-			if (user == null)
-				return BadRequest(new { result = "user_not_found" });
 
-			Timeline? timeline = _timelineRepository.GetTimelineByUserId(postDTO.UserId);
+			Timeline? timeline;
+			if (postDTO.UserId == null)
+			{
+				User? userToPost = _userRepository.GetUserByToken(token);
+				timeline = _timelineRepository.GetTimelineByUserId(userToPost?.Id);
+			}
+			else
+			{
+				timeline = _timelineRepository.GetTimelineByUserId(postDTO.UserId);
+			}
+
 			if (timeline == null)
 				return BadRequest(new { result = "user_not_found" });
 
@@ -71,7 +77,7 @@ namespace backend_pastebook_capstone.Controllers
 			_postRepository.AddPost(post);
 
 
-			return Ok(post.Id);
+			return Ok(new {result = "post_added_successfully"});
 		}
 
 		[HttpPut("update-post")]
@@ -194,12 +200,7 @@ namespace backend_pastebook_capstone.Controllers
 				};
 
 				users.Add(MiniProfileDTO);
-			}
-
-			if (users.Count == 0)
-			{
-				return NotFound(new { result = "no_likers_found" });
-			}
+			} 
 
 			return Ok(users);
 		}
@@ -255,6 +256,26 @@ namespace backend_pastebook_capstone.Controllers
 
 		}
 
+		[HttpGet("is-post-liked/{postId}")]
+		public ActionResult<bool> IsPostLiked(Guid postId)
+		{
+			string? token = Request.Headers["Authorization"];
+			if (token == null || _userRepository.GetUserByToken(token) == null)
+				return BadRequest(new { result = "no_valid_token_sent" });
 
+			User? user = _userRepository.GetUserByToken(token);
+			if(user == null)
+			{
+				return BadRequest(new { result = "no_vali_token_sent" });
+			}
+
+			Post? post = _postRepository.GetPostByPostId(postId);
+			if (post == null)
+				return NotFound(new { result = "post_not_found" });
+
+			var isLiked = _postRepository.IsCurrentPostLiked(postId, user.Id);
+
+			return isLiked;
+		}
 	}
 }

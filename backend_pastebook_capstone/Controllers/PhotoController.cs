@@ -10,7 +10,6 @@ namespace backend_pastebook_capstone.Controllers
 	public class PhotoController : ControllerBase
 	{
 
-		private readonly string _fileSavePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
 		private readonly PhotoRepository _photoRepository;
 		private readonly AlbumRepository _albumRepository;
@@ -42,7 +41,7 @@ namespace backend_pastebook_capstone.Controllers
 					return BadRequest("file_sent_empty");
 				}
 
-				string uploadsFolder = Path.Combine(_fileSavePath, "PastebookData", "photos", albumId.ToString());
+				string uploadsFolder = Path.Combine("..", "..", "PastebookData", "photos", albumId.ToString());
 				string uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName;
 				string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
@@ -68,7 +67,7 @@ namespace backend_pastebook_capstone.Controllers
 
 				_photoRepository.AddPhoto(photo);
 
-				return Ok("photo_uploaded_successfully");
+				return Ok(photo.Id);
 			}
 			catch (Exception ex)
 			{
@@ -87,7 +86,34 @@ namespace backend_pastebook_capstone.Controllers
 				return BadRequest(new { result = "no_valid_token_sent" });
 			}
 
-			/*
+			Photo? existingPhoto = _photoRepository.GetPhotoByPhotoId(photoId);
+			if (existingPhoto == null)
+			{
+				return BadRequest(new { result = "photo_notFound" });
+			}
+
+			try
+			{
+				string imagePath = Path.Combine("..", "..", "PastebookData", existingPhoto.PhotoImageURL.TrimStart('/'));
+
+				if (!System.IO.File.Exists(imagePath))
+				{
+					return NotFound("photo_file_not_found");
+				}
+
+				byte[] imageBytes = System.IO.File.ReadAllBytes(imagePath);
+
+				// Determine content type based on file extension or use a default value
+				string contentType = GetContentType(imagePath);
+
+				return File(imageBytes, contentType);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"Internal server error: {ex.Message}");
+			}
+		}
+
 		private string GetContentType(string filePath)
 		{
 			string? extension = Path.GetExtension(filePath)?.ToLowerInvariant();
@@ -107,49 +133,8 @@ namespace backend_pastebook_capstone.Controllers
 				default:
 					return "application/octet-stream"; // Default to binary if type is unknown
 			}
-		}	
-
-
-
-			 * this code will be used if we want to return the actual photo file
-			 * try
-			{
-				Photo? photo = _photoRepository.GetPhotoByPhotoId(photoId);
-
-				if (photo == null)
-				{
-					return NotFound("photo_not_found");
-				}
-
-				string imagePath = Path.Combine(_fileSavePath, "PastebookData", photo.PhotoImageURL.TrimStart('/'));
-
-				byte[] imageBytes = System.IO.File.ReadAllBytes(imagePath);
-
-				string contentType = GetContentType(imagePath);
-
-				return File(imageBytes, contentType);
-			}
-			catch (Exception ex)
-			{
-				return StatusCode(500, $"Internal server error: {ex.Message}");
-			}*/
-
-			Photo? existingPhoto = _photoRepository.GetPhotoByPhotoId(photoId);
-			if(existingPhoto == null)
-			{
-				return BadRequest(new { result = "photo_notFound" });
-			}
-
-			PhotoDTO photo = new PhotoDTO()
-			{
-				Id = existingPhoto.Id,
-				PhotoImageURL = existingPhoto.PhotoImageURL,
-				UploadDate = existingPhoto.UploadDate,
-				AlbumId = existingPhoto.AlbumId
-			};
-
-			return Ok(photo);
 		}
+
 
 		[HttpDelete("delete-photo/{photoId}")]
 		public IActionResult DeletePhoto(Guid photoId)
@@ -170,7 +155,7 @@ namespace backend_pastebook_capstone.Controllers
 					return NotFound(new {result = "photo_not_found" });
 				}
 
-				string imagePath = Path.Combine(_fileSavePath, "PastebookData", photo.PhotoImageURL.TrimStart('/'));
+				string imagePath = Path.Combine("..", "PastebookData", photo.PhotoImageURL.TrimStart('/'));
 
 				System.IO.File.Delete(imagePath);
 
