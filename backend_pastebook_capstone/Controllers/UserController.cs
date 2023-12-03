@@ -178,9 +178,6 @@ namespace backend_pastebook_capstone.Controllers
 			if (token == null || _userRepository.GetUserByToken(token) == null)
 				return BadRequest(new { result = "no_token_sent" });
 
-			if (!ModelState.IsValid)
-				return BadRequest(new { result = "invalid_user" });
-
 			User? existingUser = _userRepository.GetUserByToken(token);
 			if (existingUser == null)
 				return NotFound(new { result = "user_not_found" });

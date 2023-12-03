@@ -124,7 +124,7 @@ namespace backend_pastebook_capstone.Controllers
 			if(commentList == null)
 				return NotFound(new { result = "no_comments_found" });
 
-			List<CommentDTO> commentDTOList = new List<CommentDTO>();
+			/*List<CommentDTO> commentDTOList = new List<CommentDTO>();
 			foreach(Comment comment in commentList)
 			{
 				commentDTOList.Add(new CommentDTO
@@ -135,9 +135,9 @@ namespace backend_pastebook_capstone.Controllers
 					PostId = comment.PostId,
 					CommenterId = comment.CommenterId
 				});
-			}
+			}*/
 
-			return Ok(commentDTOList);
+			return Ok(commentList);
 		}
 
 

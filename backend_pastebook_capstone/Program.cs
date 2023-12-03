@@ -8,6 +8,7 @@ using backend_pastebook_capstone.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -107,7 +108,14 @@ namespace backend_pastebook_capstone
 			
 			app.UseCors("AllowAllOrigins");
 
-			app.UseStaticFiles();
+			/*app.UseStaticFiles(new StaticFileOptions
+			{
+				FileProvider = new PhysicalFileProvider(
+				Path.Combine(Directory.GetCurrentDirectory(), "PastebookData", "photos")
+				),
+				RequestPath = "/photos"
+			});*/
+
 
 			app.UseAuthorization();
 

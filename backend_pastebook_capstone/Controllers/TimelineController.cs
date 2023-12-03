@@ -23,7 +23,7 @@ namespace backend_pastebook_capstone.Controllers
 		}
 
 		[HttpGet("get-all-posts")]
-		public ActionResult<IEnumerable<PostDTO>> GetAllPosts()
+		public ActionResult<IEnumerable<Post>> GetAllPosts()
 		{
 			string? token = Request.Headers["Authorization"];
 			if (token == null)
@@ -45,28 +45,11 @@ namespace backend_pastebook_capstone.Controllers
 				return NotFound(new { result = "no_posts_found" });
 			}
 
-			List<PostDTO>? postDTOs = new List<PostDTO>();
-			foreach (var post in posts)
-			{
-				var postDTO = new PostDTO
-				{
-					Id = post.Id,
-					PostTitle = post.PostTitle,
-					PostBody = post.PostBody,
-					DatePosted = post.DatePosted,
-					PhotoId = post.PhotoId,
-					UserId = _userRepository.GetUserByTimelineId(timeline.Id)?.Id,
-					PosterId = post.PosterId
-				};
-
-				postDTOs.Add(postDTO);
-			}
-
-			return postDTOs;
+			return posts;
 		}
 
 		[HttpGet("get-newsfeed-posts")]
-		public ActionResult<IEnumerable<PostDTO>> GetAllNewsfeedPostsByUserId()
+		public ActionResult<IEnumerable<Post>> GetAllNewsfeedPostsByUserId()
 		{
 			string? token = Request.Headers["Authorization"];
 			if (token == null)
@@ -101,25 +84,7 @@ namespace backend_pastebook_capstone.Controllers
 
 			allPosts = allPosts.OrderByDescending(post => post.DatePosted).ToList();
 
-
-			List<PostDTO>? postDTOs = new List<PostDTO>();
-			foreach (var post in allPosts)
-			{
-				var postDTO = new PostDTO
-				{
-					Id = post.Id,
-					PostTitle = post.PostTitle,
-					PostBody = post.PostBody,
-					DatePosted = post.DatePosted,
-					PhotoId = post.PhotoId,
-					UserId = _userRepository.GetUserByTimelineId(post.TimelineId)?.Id,
-					PosterId = post.PosterId
-				};
-
-				postDTOs.Add(postDTO);
-			}
-
-			return postDTOs;
+			return allPosts;
 		}
 	}
 }
