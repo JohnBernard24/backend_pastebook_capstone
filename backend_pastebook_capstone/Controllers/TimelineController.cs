@@ -22,16 +22,19 @@ namespace backend_pastebook_capstone.Controllers
 			_userRepository = userRepository;
 		}
 
-		[HttpGet("get-all-posts")]
-		public ActionResult<IEnumerable<Post>> GetAllPosts()
+		[HttpGet("get-all-posts/{userId}")]
+		public ActionResult<IEnumerable<Post>> GetAllPosts(Guid userId)
 		{
 			string? token = Request.Headers["Authorization"];
 			if (token == null)
 				return BadRequest(new { result = "no_valid_token_sent" });
 
-			User? user = _userRepository.GetUserByToken(token);
+			User? user = _userRepository.GetUserById(userId);
 			if (user == null)
-				return BadRequest(new { result = "no_valid_token_sent" });
+				user = _userRepository.GetUserByToken(token);
+
+			if (user == null)
+				return BadRequest(new { result = "user_not_found" });
 
 
 			Timeline? timeline = _timelineRepository.GetTimelineByUserId(user.Id);

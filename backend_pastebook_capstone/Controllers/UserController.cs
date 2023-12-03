@@ -24,8 +24,8 @@ namespace backend_pastebook_capstone.Controllers
 		}
 
 
-		[HttpGet("get-profile")]
-		public IActionResult GetUserProfile()
+		[HttpGet("get-profile/{userId}")]
+		public IActionResult GetUserProfile(Guid userId)
 		{
 			string? token = Request.Headers["Authorization"];
 			if (token == null || _userRepository.GetUserByToken(token) == null)
@@ -34,8 +34,12 @@ namespace backend_pastebook_capstone.Controllers
 			if (!ModelState.IsValid)
 				return BadRequest(new { result = "invalid_user" });
 
-			User? checkingForUser = _userRepository.GetUserByToken(token);
+
+			User? checkingForUser = _userRepository.GetUserById(userId);
 			if (checkingForUser == null)
+				checkingForUser = _userRepository.GetUserByToken(token);
+
+			if(checkingForUser == null)
 				return BadRequest(new { result = "user_not_found" });
 
 			ProfileDTO profileDTO = new ProfileDTO
@@ -52,8 +56,8 @@ namespace backend_pastebook_capstone.Controllers
 			return Ok(profileDTO);
 		}
 
-		[HttpGet("get-mini-profile")]
-		public IActionResult GetMiniProfile()
+		[HttpGet("get-mini-profile/{userId}")]
+		public IActionResult GetMiniProfile(Guid userId)
 		{
 			string? token = Request.Headers["Authorization"];
 			if (token == null || _userRepository.GetUserByToken(token) == null)
@@ -61,8 +65,11 @@ namespace backend_pastebook_capstone.Controllers
 
 			if (!ModelState.IsValid)
 				return BadRequest(new { result = "invalid_user" });
-			
-			User? checkingForUser = _userRepository.GetUserByToken(token);
+
+			User? checkingForUser = _userRepository.GetUserById(userId);
+			if (checkingForUser == null)
+				checkingForUser = _userRepository.GetUserByToken(token);
+
 			if (checkingForUser == null)
 				return BadRequest(new { result = "user_not_found" });
 

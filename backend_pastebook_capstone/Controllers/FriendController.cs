@@ -197,6 +197,24 @@ namespace backend_pastebook_capstone.Controllers
 			return Ok(friendRequests);
 		}
 
+		[HttpPost("get-friend-exist")]
+		public ActionResult<Friend?> getFriendExist([FromBody] FriendDTO friendDTO)
+		{
+			string? token = Request.Headers["Authorization"];
+			if (token == null || _userRepository.GetUserByToken(token) == null)
+				return BadRequest(new { result = "no_valid_token_sent" });
+
+			User? receiver = _userRepository.GetUserById(friendDTO.ReceiverId);
+			if (receiver == null)
+				return BadRequest(new { result = "receiver_not_valid" });
+
+			User? sender = _userRepository.GetUserByToken(token);
+			if (sender == null)
+				return BadRequest(new { result = "sender_not_valid" });
+
+			return _friendRepository.FriendExist(friendDTO.SenderId, friendDTO.ReceiverId);
+		}
+
 
 	}
 }
