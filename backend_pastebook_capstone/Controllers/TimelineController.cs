@@ -69,13 +69,22 @@ namespace backend_pastebook_capstone.Controllers
 				return BadRequest(new { result = "no_friends_found" });
 			}
 
-			List<Post> friendsPosts = new List<Post>();
+			List<Post>? friendsPosts = new List<Post>();
 
 			foreach (Friend friend in friends)
 			{
-				List<Post> individualPost = _postRepository.GetPostListByUserId(friend.SenderId);
+				List<Post> IndividualFriendPost = new List<Post>();
+				if (user.Id == friend.SenderId)
+				{
+					friendsPosts = _postRepository.GetPostListByUserId(friend.ReceiverId);
+				}
+				// Add posts from the friend where the user is the receiver
+				else if (user.Id == friend.ReceiverId)
+				{
+					friendsPosts = _postRepository.GetPostListByUserId(friend.SenderId);
+				}
 
-				foreach (Post post in individualPost)
+				foreach (Post post in IndividualFriendPost)
 				{
 					friendsPosts.Add(post);
 				}
