@@ -75,11 +75,11 @@ namespace backend_pastebook_capstone.Controllers
 			{
 				case "like":
 					Like? like = _notificationRepository.GetLikeByContextId(notification.ContextId);
-					return SerializeAndReturn(like?.Post);
+					return SerializeAndReturn(like);
 
 				case "comment":
 					Comment? comment = _notificationRepository.GetCommentByContextId(notification.ContextId);
-					return SerializeAndReturn(comment?.Post);
+					return SerializeAndReturn(comment);
 
 				case "add-friend-request":
 				case "accept-friend-request":
@@ -119,5 +119,22 @@ namespace backend_pastebook_capstone.Controllers
 				StatusCode = 200
 			};
 		}
+
+
+		[HttpDelete("delete-notification/{notificationId}")]
+		public IActionResult DeleteNotification(Guid notificationId)
+		{
+			string? token = Request.Headers["Authorization"];
+            if (token == null || _userRepository.GetUserByToken(token) == null)
+                return BadRequest(new { result = "no_token_sent" });
+
+            Notification? notification = _notificationRepository.GetNotificationByNotificationId(notificationId);
+            if (notification == null)
+                return NotFound(new { result = "no_notification_found" });
+
+			_notificationRepository.RemoveNotification(notification);
+
+			return Ok(new { result = "notification successfully deleted" });
+        }
 	}
 }
