@@ -83,7 +83,7 @@ namespace backend_pastebook_capstone.Controllers
 				return BadRequest(new { result = "friend_request_already_accepted" });
 
 			friendRequest.IsFriend = true;
-			friendRequest.FriendshipDate = DateTime.UtcNow;
+			friendRequest.FriendshipDate = DateTime.Now;
 
 			_friendRepository.UpdateFriend(friendRequest);
 

@@ -75,11 +75,11 @@ namespace backend_pastebook_capstone.Controllers
 			{
 				case "like":
 					Like? like = _notificationRepository.GetLikeByContextId(notification.ContextId);
-					return SerializeAndReturn(like?.Post);
+					return SerializeAndReturn(like);
 
 				case "comment":
 					Comment? comment = _notificationRepository.GetCommentByContextId(notification.ContextId);
-					return SerializeAndReturn(comment?.Post);
+					return SerializeAndReturn(comment);
 
 				case "add-friend-request":
 				case "accept-friend-request":

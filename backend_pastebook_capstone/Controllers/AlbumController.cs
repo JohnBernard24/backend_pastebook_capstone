@@ -186,18 +186,17 @@ namespace backend_pastebook_capstone.Controllers
 				// Fetch the first photo for the current album
 				Photo? firstPhoto = _photoRepository.GetFirstPhotoForAlbum(albumDTO.Id);
 
-				if (firstPhoto == null)
+				PhotoDTO firstPhotoDTO = new PhotoDTO();
+				if (firstPhoto != null)
 				{
-					continue;
+					firstPhotoDTO = new PhotoDTO
+					{
+						Id = firstPhoto.Id,
+						PhotoImageURL = firstPhoto.PhotoImageURL,
+						AlbumId = firstPhoto.AlbumId,
+						UploadDate = firstPhoto.UploadDate,
+					};
 				}
-
-				PhotoDTO firstPhotoDTO = new PhotoDTO
-				{
-					Id = firstPhoto.Id,
-					PhotoImageURL = firstPhoto.PhotoImageURL,
-					AlbumId = firstPhoto.AlbumId,
-					UploadDate = firstPhoto.UploadDate,
-				};
 
 				// Create an AlbumWithFirstPhoto object that includes album information and the first photo
 				AlbumWithFirstPhoto albumWithFirstPhoto = new AlbumWithFirstPhoto
