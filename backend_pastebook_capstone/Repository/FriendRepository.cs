@@ -32,7 +32,7 @@ namespace backend_pastebook_capstone.Repository
 		public List<Friend> GetFriendListByUserId(Guid userId)
 		{
 			return _context.Friend
-				.Where(f => f.ReceiverId == userId && f.IsFriend == true)
+				.Where(f => (f.ReceiverId == userId || f.SenderId == userId) && f.IsFriend == true)
 				.ToList();
 		}
 
@@ -40,7 +40,6 @@ namespace backend_pastebook_capstone.Repository
 		{
 			var friendCount = _context.Friend
 				.Where(f => (f.ReceiverId == userId || f.SenderId == userId) && f.IsFriend == true)
-				.Select(f => f.SenderId)
 				.Distinct()
 				.Count();
 

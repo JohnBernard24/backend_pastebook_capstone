@@ -158,7 +158,7 @@ namespace backend_pastebook_capstone.Controllers
 			if (token == null)
 				return BadRequest(new { result = "no_valid_token_sent" });
 
-			User? user = _userRepository.GetUserByToken(token);
+			User? user = _userRepository.GetUserByToken(token);	
 			if (user == null)
 				return BadRequest(new { result = "user_invalid" });
 
