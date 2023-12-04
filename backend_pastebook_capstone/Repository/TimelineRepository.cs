@@ -23,6 +23,7 @@ namespace backend_pastebook_capstone.Repository
 			return _context.Post
 				.Where(post => post.TimelineId == timelineId)
 				.Include(post => post.Poster)
+				.Include(post => post.Poster!.Photo)
 				.Include(post => post.Timeline)
 				.Include(post => post.Photo)
 				.ToList();

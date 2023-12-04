@@ -162,7 +162,7 @@ namespace backend_pastebook_capstone.Controllers
 			if (user == null)
 				return BadRequest(new { result = "user_invalid" });
 
-			List<Album>? albums = _albumRepository.GetAlbumsLimitBySix(user.Id);
+			List<Album>? albums = _albumRepository.GetAlbumsListByUserId(user.Id);
 			if (albums == null)
 				return NotFound(new { result = "no_albums_found" });
 
@@ -231,6 +231,23 @@ namespace backend_pastebook_capstone.Controllers
 
 			return album.Id;
 		}
+
+		[HttpGet("get-album-by-id/{albumId}")]
+		public ActionResult<Album> GetAlbumById(Guid albumId)
+		{
+			string? token = Request.Headers["Authorization"];
+			if (token == null)
+				return BadRequest(new { result = "no_valid_token_sent" });
+			Album? album = _albumRepository.GetAlbumByAlbumId(albumId);
+			if (album == null)
+				return BadRequest(new { result = "no_album" });
+			return album;
+		}
+
+
+
+
+		
 
 	}
 }
