@@ -158,18 +158,21 @@ namespace backend_pastebook_capstone.Controllers
 			return Ok(new { result = "friend_removed" });
 		}
 
-		[HttpGet("get-all-friends")]
-		public ActionResult<IEnumerable<User>> GetAllFriendsByUserId()
+		[HttpGet("get-all-friends/{userId}")]
+		public ActionResult<IEnumerable<User>> GetAllFriendsByUserId(Guid userId)
 		{
 			string? token = Request.Headers["Authorization"];
 			if (token == null || _userRepository.GetUserByToken(token) == null)
 				return BadRequest(new { result = "no_token_sent" });
 
-			User? checkingForUser = _userRepository.GetUserByToken(token);
-			if(checkingForUser == null)
+			User? user = _userRepository.GetUserById(userId);
+			if (user == null)
+				user = _userRepository.GetUserByToken(token);
+
+			if (user == null)
 				return BadRequest(new { result = "user_not_found" });
 
-			List<User> friends = _friendRepository.GetUserFriendListByUserId(checkingForUser.Id);
+			List<User> friends = _friendRepository.GetUserFriendListByUserId(user.Id);
 
 			if (friends == null)
 				return BadRequest(new { result = "no_friends_found" });
