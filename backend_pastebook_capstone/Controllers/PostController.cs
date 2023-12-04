@@ -151,18 +151,9 @@ namespace backend_pastebook_capstone.Controllers
 				return BadRequest(new { result = "post_not_found" });
 			}
 		
-			PostDTO postDTO = new PostDTO
-			{
-				Id = post.Id,
-				PostTitle = post.PostTitle,
-				PostBody = post.PostBody,
-				DatePosted = post.DatePosted,
-				PhotoId = post.PhotoId,
-				UserId = _userRepository.GetUserByTimelineId(post.TimelineId)?.Id,
-				PosterId = post.PosterId,
-			};
+			
 
-			return Ok(postDTO);
+			return Ok(post);
 		}
 
 		[HttpGet("get-post-likes/{postId}")]

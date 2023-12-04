@@ -48,6 +48,8 @@ namespace backend_pastebook_capstone.Controllers
 				return NotFound(new { result = "no_posts_found" });
 			}
 
+			posts = posts.OrderByDescending(post => post.DatePosted).ToList();
+
 			return posts;
 		}
 
