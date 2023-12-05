@@ -1,5 +1,6 @@
 ﻿using backend_pastebook_capstone.Data;
 using backend_pastebook_capstone.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend_pastebook_capstone.Repository
 {
@@ -19,7 +20,7 @@ namespace backend_pastebook_capstone.Repository
 
 		public Comment? GetCommentById(Guid? id)
 		{
-			return _context.Comment.FirstOrDefault(x => x.Id == id);
+			return _context.Comment.Include(x => x.Commenter).FirstOrDefault(x => x.Id == id);
 		}
 
 		public void AddComment(Comment comment)
