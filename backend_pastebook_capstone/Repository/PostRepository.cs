@@ -15,7 +15,7 @@ namespace backend_pastebook_capstone.Repository
 
 		public Post? GetPostByPostId(Guid? postId)
 		{
-			return _context.Post.FirstOrDefault(p => p.Id == postId);
+			return _context.Post.Include(p=> p.Poster).Include(p=> p.Photo).FirstOrDefault(p => p.Id == postId);
 		}
 
 		public List<Post> GetPostListByUserId(Guid userId)
