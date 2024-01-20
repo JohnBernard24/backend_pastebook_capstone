@@ -93,5 +93,11 @@ namespace backend_pastebook_capstone.Models
 		public string NewPassword { get; set; } = null!;
 	}
 
+    public class ForgotPasswordDTO
+    {
+		public string Email { get; set; } = null!;
+        public string NewPassword { get; set; } = null!;
+    }
+
 
 }

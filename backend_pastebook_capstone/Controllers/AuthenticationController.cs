@@ -43,19 +43,19 @@ namespace backend_pastebook_capstone.Controllers
 		{
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(new { result = "invalid_user_login" });
+				return BadRequest(new { result = "Invalid user login" });
 			}
 
 			User? user = _userRepository.GetUserByEmail(userLoginDTO.Email);
 			if (user == null)
 			{
-				return Unauthorized(new { result = "no_user_found" });
+				return Unauthorized(new { result = "Could not find account!" });
 			}
 
 			bool isCorrectPassword = _passwordHasher.VerifyPassword(userLoginDTO.Password, user.HashedPassword);
 			if (!isCorrectPassword)
 			{
-				return Unauthorized(new { result = "invalid_credentials" });
+				return Unauthorized(new { result = "Invalid credentials!" });
 			}
 
 			string token = _authenticator.Authenticate(user);
@@ -76,13 +76,13 @@ namespace backend_pastebook_capstone.Controllers
 		{
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(new { result = "invalid_user_registration" });
+				return BadRequest(new { result = "Invalid user registration" });
 			}
 
 			User? existingUser = _userRepository.GetUserByEmail(userRegisterDTO.Email);
 			if (existingUser != null)
 			{
-				return Conflict(new { result = "email_already_exits" });
+				return Conflict(new { result = "Email Already Exists!" });
 			}
 
 			User user = new User
@@ -112,8 +112,9 @@ namespace backend_pastebook_capstone.Controllers
 			_userRepository.AddUser(user);
 			_timelineRepository.AddTimeline(timeline);
 			_albumRepository.AddAlbum(album);
+			
 
-			return Ok(new { result = "user_registered_successfully" });
+			return Ok(new { result = "User Registered Successfully" });
 		}
 
 		[HttpPost("logout")]
@@ -169,14 +170,13 @@ namespace backend_pastebook_capstone.Controllers
 		{
 			User? user = _userRepository.GetUserByEmail(recipientEmail);
 			if (user == null)
-				return BadRequest(new { result = "no_account_with_that_email" });
+				return BadRequest(new { result = "Account does not exist" });
 
 			bool result = _verificationRepository.SendVerificationEmail(recipientEmail);
 
 			if (result)
 			{
 				return Ok(new { result = "Email sent successfully!" });
-
 			}
 			else
 			{
@@ -192,12 +192,10 @@ namespace backend_pastebook_capstone.Controllers
             if (result)
             {
 				return Ok(new { result = "Email sent successfully!" });
-				//return true;
             }
             else
             {
 				return BadRequest(new { result = "Error sending email." });
-				//return false;
             }
         }
         
@@ -208,7 +206,7 @@ namespace backend_pastebook_capstone.Controllers
 			Verification? verification = _verificationRepository.GetVerificationByEmail(verificationDTO.Email);
 			if(verification == null)
 			{
-				return BadRequest(new { result = "no_verification_with_that_email" });
+				return BadRequest(new { result = "No Verification with that email" });
 			}
 
 			return verificationDTO.VerificationCode == verification.VerificationCode;
@@ -227,5 +225,24 @@ namespace backend_pastebook_capstone.Controllers
 				return false;
 			}
 		}
-	}
+
+        [HttpPut("forgot-change-password")]
+        public IActionResult EditPassword([FromBody] ForgotPasswordDTO forgotPasswordDTO)
+        {
+			Console.WriteLine(forgotPasswordDTO.NewPassword);
+            if (!ModelState.IsValid)
+                return BadRequest(new { result = "invalid_user" });
+
+            User? existingUser = _userRepository.GetUserByEmail(forgotPasswordDTO.Email);
+            if (existingUser == null)
+                return NotFound(new { result = "user_not_found" });
+
+
+            existingUser.HashedPassword = _passwordHasher.HashPassword(forgotPasswordDTO.NewPassword);
+
+            _userRepository.UpdateUser(existingUser);
+
+            return Ok(new {result = "password_changed_successfully"});
+        }
+    }
 }
