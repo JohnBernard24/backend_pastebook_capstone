@@ -29,6 +29,20 @@ namespace backend_pastebook_capstone.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "Verification",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false),
+                    Email = table.Column<string>(type: "longtext", nullable: false),
+                    VerificationCode = table.Column<string>(type: "longtext", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Verification", x => x.Id);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "Album",
                 columns: table => new
                 {
@@ -349,6 +363,9 @@ namespace backend_pastebook_capstone.Migrations
 
             migrationBuilder.DropTable(
                 name: "Notification");
+
+            migrationBuilder.DropTable(
+                name: "Verification");
 
             migrationBuilder.DropTable(
                 name: "Post");

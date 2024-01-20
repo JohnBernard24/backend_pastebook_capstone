@@ -23,8 +23,9 @@ namespace backend_pastebook_capstone.Controllers
 		private readonly UserRepository _userRepository;
 		private readonly TimelineRepository _timelineRepository;
 		private readonly AlbumRepository _albumRepository;
+		private readonly VerificationRepository _verificationRepository;
 
-		public AuthenticationController(UserRepository userRepository, BcryptPasswordHasher passwordHasher, Authenticator authenticator, TimelineRepository timelineRepository, AlbumRepository albumRepository, AccessTokenRepository accessTokenRepository)
+		public AuthenticationController(UserRepository userRepository, BcryptPasswordHasher passwordHasher, Authenticator authenticator, TimelineRepository timelineRepository, AlbumRepository albumRepository, AccessTokenRepository accessTokenRepository, VerificationRepository verificationRepository)
 		{
 			_passwordHasher = passwordHasher;
 			_authenticator = authenticator;
@@ -33,6 +34,7 @@ namespace backend_pastebook_capstone.Controllers
 			_timelineRepository = timelineRepository;
 			_albumRepository = albumRepository;
 			_accessTokenRepository = accessTokenRepository;
+			_verificationRepository = verificationRepository;
 		}
 
 
@@ -45,7 +47,7 @@ namespace backend_pastebook_capstone.Controllers
 			}
 
 			User? user = _userRepository.GetUserByEmail(userLoginDTO.Email);
-			if(user == null)
+			if (user == null)
 			{
 				return Unauthorized(new { result = "no_user_found" });
 			}
@@ -78,7 +80,7 @@ namespace backend_pastebook_capstone.Controllers
 			}
 
 			User? existingUser = _userRepository.GetUserByEmail(userRegisterDTO.Email);
-			if(existingUser != null)
+			if (existingUser != null)
 			{
 				return Conflict(new { result = "email_already_exits" });
 			}
@@ -118,7 +120,7 @@ namespace backend_pastebook_capstone.Controllers
 		public IActionResult logout()
 		{
 			string? token = Request.Headers["Authorization"];
-			if(token == null)
+			if (token == null)
 			{
 				return BadRequest(new { result = "no_valid_token_sent" });
 			}
@@ -132,112 +134,98 @@ namespace backend_pastebook_capstone.Controllers
 			return Ok(new { result = "logout successfully" });
 		}
 
-		[HttpGet("validate-token")]
-		public ActionResult<bool> Validate()
-		{
-			string? token = Request.Headers["Authorization"];
-			if(token == null || _userRepository.GetUserByToken(token) == null)
+        [HttpGet("validate-token")]
+        public ActionResult<bool> Validate()
+        {
+            string? token = Request.Headers["Authorization"];
+
+            if (token == null)
+            {
+                return BadRequest(new { result = "no_valid_token_sent" });
+            }
+
+			User? user = _userRepository.GetUserByToken(token);
+
+			if (user == null)
 			{
-				return BadRequest(new { result = "no_valid_token_sent" });
+				return Unauthorized(new { result = "no_user_found" });
 			}
-			return Ok(_authenticator.Validate(token));
-		}
 
-		[HttpPost("verify-email/{recipientEmail}")]
-		public IActionResult SendEmail(string recipientEmail)
+			bool isValid = _authenticator.Validate(token);
+
+            if (isValid)
+            {
+                return Ok(true);
+            }
+            else
+            {
+                return Unauthorized(new { result = "invalid_token" });
+            }
+        }
+
+
+		[HttpPost("verify-email-forgot/{recipientEmail}")]
+		public IActionResult SendEmailForgot(string recipientEmail)
 		{
-			var senderEmail = "teametivacpastebook@gmail.com";
-			var senderPassword = "nbci cmzt wqds krbv";
-
 			User? user = _userRepository.GetUserByEmail(recipientEmail);
 			if (user == null)
 				return BadRequest(new { result = "no_account_with_that_email" });
 
-			var message = new MailMessage(senderEmail, recipientEmail)
+			bool result = _verificationRepository.SendVerificationEmail(recipientEmail);
+
+			if (result)
 			{
-				Subject = $"Verify your email, {user.Email}!",
-				IsBodyHtml = true,
-				Body =
-				$@"
-					<html>
-					<head>
-					<title>Pastebook Email Confirmation</title>
-					<style>
-					body {{
-					  font-family: sans-serif;
-					  margin: 0;
-					  padding: 0;
-					}}
-
-					.container {{
-					  width: 600px;
-					  margin: 0 auto;
-					}}
-
-					h1 {{
-					  text-align: center;
-					  font-size: 30px;
-					  margin-top: 40px;
-					}}
-
-					p {{
-					  font-size: 16px;
-					  line-height: 1.5;
-					}}
-
-					a {{
-					  color: #fff;
-					  background-color: #f9a113;
-					  padding: 10px 20px;
-					  border-radius: 4px;
-					  text-decoration: none;
-					}}
-
-					.footer {{
-					  text-align: center;
-					  font-size: 12px;
-					  margin-top: 40px;
-					}}
-					</style>
-					</head>
-					<body>
-					  <div class=""container"">
-						<img style='width: 100;' src = 'https://cdn.discordapp.com/attachments/1174240282951303239/1176866765209337886/Logo1_dark.PNG?ex=65706d95&is=655df895&hm=62cdfca8d61e6fd565803260716f0493e37f4d764e82c5b5d8e11f9e861783e3&' alt = 'Pastebook Logo'>
-						<h1>Email Confirmation</h1>
-						<p>
-						  Hey {user.FirstName + " " + user.LastName}, you're almost ready!
-						</p>
-						<p>
-						  Simply click the big button below to verify your email address.
-						</p>
-						<a href=""http://localhost:4200/forgot-password/{user.Id}"" style=""display:inline-block;padding:10px 20px;background-color:#007BFF;color:#ffffff;text-decoration:none;border-radius:5px;"">Confirm Email</a>
-						<div class=""footer"">
-						  Copyright © 2023 Team Etivac. All rights reserved. Email sent by Pastebook.com.
-						</div>
-					  </div>
-					</body>
-					</html>
-				"
-			};
-
-			var smtpClient = new SmtpClient("smtp.gmail.com")
-			{
-				Port = 587,
-				Credentials = new NetworkCredential(senderEmail, senderPassword),
-				EnableSsl = true,
-			};
-
-			try
-			{
-				smtpClient.SendMailAsync(message);
 				return Ok(new { result = "Email sent successfully!" });
+
 			}
-			catch (Exception)
+			else
 			{
 				return BadRequest(new { result = "Error sending email." });
-			}
+            }
 		}
 
+        [HttpPost("verify-email-new-user/{recipientEmail}")]
+        public IActionResult SendNewUserEmail(string recipientEmail)
+        {
+            bool result = _verificationRepository.SendVerificationEmail(recipientEmail);
 
+            if (result)
+            {
+				return Ok(new { result = "Email sent successfully!" });
+				//return true;
+            }
+            else
+            {
+				return BadRequest(new { result = "Error sending email." });
+				//return false;
+            }
+        }
+        
+
+        [HttpPost("verify-code")]	
+		public ActionResult<bool> VerifyCode([FromBody] VerificationDTO verificationDTO)
+		{
+			Verification? verification = _verificationRepository.GetVerificationByEmail(verificationDTO.Email);
+			if(verification == null)
+			{
+				return BadRequest(new { result = "no_verification_with_that_email" });
+			}
+
+			return verificationDTO.VerificationCode == verification.VerificationCode;
+		}
+
+		[HttpPost("check-email-availability/{email}")]
+		public ActionResult<bool> CheckEmail(string email)
+		{
+			User? user = _userRepository.GetUserByEmail(email);
+			if (user == null)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
 	}
 }

@@ -11,7 +11,7 @@ using backend_pastebook_capstone.Data;
 namespace backend_pastebook_capstone.Migrations
 {
     [DbContext(typeof(CapstoneDBContext))]
-    [Migration("20231128224218_InitialCreate")]
+    [Migration("20240119150725_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -285,6 +285,25 @@ namespace backend_pastebook_capstone.Migrations
                     b.HasIndex("PhotoId");
 
                     b.ToTable("User");
+                });
+
+            modelBuilder.Entity("backend_pastebook_capstone.Models.Verification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("VerificationCode")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Verification");
                 });
 
             modelBuilder.Entity("backend_pastebook_capstone.Models.Album", b =>
