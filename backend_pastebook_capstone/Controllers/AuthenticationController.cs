@@ -24,8 +24,9 @@ namespace backend_pastebook_capstone.Controllers
 		private readonly TimelineRepository _timelineRepository;
 		private readonly AlbumRepository _albumRepository;
 		private readonly VerificationRepository _verificationRepository;
+		private readonly PhotoRepository _photoRepository;
 
-		public AuthenticationController(UserRepository userRepository, BcryptPasswordHasher passwordHasher, Authenticator authenticator, TimelineRepository timelineRepository, AlbumRepository albumRepository, AccessTokenRepository accessTokenRepository, VerificationRepository verificationRepository)
+		public AuthenticationController(UserRepository userRepository, BcryptPasswordHasher passwordHasher, Authenticator authenticator, TimelineRepository timelineRepository, AlbumRepository albumRepository, AccessTokenRepository accessTokenRepository, VerificationRepository verificationRepository, PhotoRepository photoRepository)
 		{
 			_passwordHasher = passwordHasher;
 			_authenticator = authenticator;
@@ -35,6 +36,7 @@ namespace backend_pastebook_capstone.Controllers
 			_albumRepository = albumRepository;
 			_accessTokenRepository = accessTokenRepository;
 			_verificationRepository = verificationRepository;
+			_photoRepository = photoRepository;
 		}
 
 
@@ -71,53 +73,95 @@ namespace backend_pastebook_capstone.Controllers
 			return Ok(loginResponse);
 		}
 
-		[HttpPost("register")]
-		public IActionResult Register([FromBody] UserRegisterDTO userRegisterDTO)
-		{
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(new { result = "Invalid user registration" });
-			}
+        [HttpPost("register")]
+        public IActionResult Register([FromBody] UserRegisterDTO userRegisterDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { result = "Invalid user registration" });
+            }
 
-			User? existingUser = _userRepository.GetUserByEmail(userRegisterDTO.Email);
-			if (existingUser != null)
-			{
-				return Conflict(new { result = "Email Already Exists!" });
-			}
+            User? existingUser = _userRepository.GetUserByEmail(userRegisterDTO.Email);
+            if (existingUser != null)
+            {
+                return Conflict(new { result = "Email Already Exists!" });
+            }
 
-			User user = new User
-			{
-				FirstName = userRegisterDTO.FirstName,
-				LastName = userRegisterDTO.LastName,
-				Email = userRegisterDTO.Email,
-				HashedPassword = _passwordHasher.HashPassword(userRegisterDTO.Password),
-				BirthDate = userRegisterDTO.BirthDate,
-				Sex = userRegisterDTO.Sex,
-				PhoneNumber = userRegisterDTO.PhoneNumber
-			};
+            User user = new User
+            {
+                FirstName = userRegisterDTO.FirstName,
+                LastName = userRegisterDTO.LastName,
+                Email = userRegisterDTO.Email,
+                HashedPassword = _passwordHasher.HashPassword(userRegisterDTO.Password),
+                BirthDate = userRegisterDTO.BirthDate,
+                Sex = userRegisterDTO.Sex,
+                PhoneNumber = userRegisterDTO.PhoneNumber
+            };
 
-			Timeline timeline = new Timeline
-			{
-				UserId = user.Id,
-				User = user
-			};
+            Timeline timeline = new Timeline
+            {
+                UserId = user.Id,
+                User = user
+            };
 
-			Album album = new Album
-			{
-				AlbumName = "Uploads",
-				UserId = user.Id,
-				User = user
-			};
+            Album album = new Album
+            {
+                AlbumName = "Uploads",
+                UserId = user.Id,
+                User = user
+            };
 
-			_userRepository.AddUser(user);
-			_timelineRepository.AddTimeline(timeline);
-			_albumRepository.AddAlbum(album);
-			
+            _userRepository.AddUser(user);
+            _timelineRepository.AddTimeline(timeline);
+            _albumRepository.AddAlbum(album);
 
-			return Ok(new { result = "User Registered Successfully" });
-		}
+            string fileName;
+            if (userRegisterDTO.Sex == "Male")
+            {
+                fileName = "sample_avatar_male.png";
+            }
+            else if (userRegisterDTO.Sex == "Female")
+            {
+                fileName = "sample_avatar_female.png";
+            }
+            else
+            {
+                fileName = "sample_avatar_neutral.png";
+            }
 
-		[HttpPost("logout")]
+            string wwwrootPath = "wwwroot";
+            string sourceFilePath = Path.Combine(wwwrootPath, fileName);
+
+            string uniqueFileName = Guid.NewGuid().ToString() + "_" + fileName;
+            string uploadsFolder = Path.Combine("..", "..", "PastebookData", "photos", album.Id.ToString());
+            string destinationFilePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            System.IO.File.Copy(sourceFilePath, destinationFilePath, true);
+
+            string imageUrl = $"photos/{album.Id}/{uniqueFileName}";
+
+            Photo photo = new Photo
+            {
+                PhotoImageURL = imageUrl,
+                AlbumId = album.Id,
+                Album = album
+            };
+
+            user.PhotoId = photo.Id;
+            user.Photo = photo;
+
+            _photoRepository.AddPhoto(photo);
+
+            return Ok(new { result = "User Registered Successfully" });
+        }
+
+
+        [HttpPost("logout")]
 		public IActionResult logout()
 		{
 			string? token = Request.Headers["Authorization"];
@@ -229,7 +273,6 @@ namespace backend_pastebook_capstone.Controllers
         [HttpPut("forgot-change-password")]
         public IActionResult EditPassword([FromBody] ForgotPasswordDTO forgotPasswordDTO)
         {
-			Console.WriteLine(forgotPasswordDTO.NewPassword);
             if (!ModelState.IsValid)
                 return BadRequest(new { result = "invalid_user" });
 

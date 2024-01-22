@@ -118,11 +118,11 @@ namespace backend_pastebook_capstone.Controllers
 		{
 			string? token = Request.Headers["Authorization"];
 			if (token == null || _userRepository.GetUserByToken(token) == null)
-				return BadRequest(new { result = "no_token_sent" });
+				return BadRequest(new { result = "No token sent" });
 
 			User? existingUser = _userRepository.GetUserByToken(token);
 			if (existingUser == null)
-				return NotFound(new { result = "user_not_found" });
+				return NotFound(new { result = "User token not valid" });
 
 			existingUser.Email = email;
 
@@ -142,24 +142,37 @@ namespace backend_pastebook_capstone.Controllers
 			return Ok(profileDTO);
 		}
 
-		[HttpPut("edit-password")]
-		public IActionResult EditPassword([FromBody] EditPasswordDTO editPasswordDTO)
+		[HttpPost("check-password/{currentPassword}")]
+		public ActionResult<bool> CheckPassword(string currentPassword)
+		{
+			string? token = Request.Headers["Authorization"];
+			if(token == null)
+                return BadRequest(new { result = "Invalid token sent" });
+
+            User? user = _userRepository.GetUserByToken(token);
+            if (user == null)
+                return NotFound(new { result = "No user found" });
+
+			if (!_passwordHasher.VerifyPassword(currentPassword, user.HashedPassword))
+				return BadRequest(new {result = "Passwords do not match"});
+
+			return true;
+
+        }
+
+
+        [HttpPut("edit-password/{newPassword}")]
+		public IActionResult EditPassword(string newPassword)
 		{
 			string? token = Request.Headers["Authorization"];
 			if (token == null || _userRepository.GetUserByToken(token) == null)
 				return BadRequest(new { result = "no_token_sent" });
 
-			if (!ModelState.IsValid)
-				return BadRequest(new { result = "invalid_user" });
-
 			User? existingUser = _userRepository.GetUserByToken(token);
 			if (existingUser == null)
 				return NotFound(new { result = "user_not_found" });
 
-			if (!_passwordHasher.VerifyPassword(editPasswordDTO.CurrentPassword, existingUser.HashedPassword))
-				return BadRequest(new { result = "passwords_do_not_match" });
-
-			existingUser.HashedPassword = _passwordHasher.HashPassword(editPasswordDTO.NewPassword);
+			existingUser.HashedPassword = _passwordHasher.HashPassword(newPassword);
 
 			_userRepository.UpdateUser(existingUser);
 
@@ -190,7 +203,7 @@ namespace backend_pastebook_capstone.Controllers
 				return NotFound(new { result = "user_not_found" });
 
 			existingUser.Photo = _photoRepository.GetPhotoByPhotoId(profileImageId);
-			existingUser.ProfileImageId = profileImageId;
+			existingUser.PhotoId = profileImageId;
 
 			_userRepository.UpdateUser(existingUser);
 

@@ -271,9 +271,6 @@ namespace backend_pastebook_capstone.Migrations
                     b.Property<Guid?>("PhotoId")
                         .HasColumnType("char(36)");
 
-                    b.Property<Guid?>("ProfileImageId")
-                        .HasColumnType("char(36)");
-
                     b.Property<string>("Sex")
                         .HasColumnType("longtext");
 

@@ -90,7 +90,6 @@ namespace backend_pastebook_capstone.Migrations
                     Sex = table.Column<string>(type: "longtext", nullable: true),
                     PhoneNumber = table.Column<string>(type: "longtext", nullable: true),
                     AboutMe = table.Column<string>(type: "longtext", nullable: true),
-                    ProfileImageId = table.Column<Guid>(type: "char(36)", nullable: true),
                     PhotoId = table.Column<Guid>(type: "char(36)", nullable: true)
                 },
                 constraints: table =>

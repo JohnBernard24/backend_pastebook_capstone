@@ -11,7 +11,7 @@ using backend_pastebook_capstone.Data;
 namespace backend_pastebook_capstone.Migrations
 {
     [DbContext(typeof(CapstoneDBContext))]
-    [Migration("20240119150725_InitialCreate")]
+    [Migration("20240122023649_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -272,9 +272,6 @@ namespace backend_pastebook_capstone.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<Guid?>("PhotoId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid?>("ProfileImageId")
                         .HasColumnType("char(36)");
 
                     b.Property<string>("Sex")

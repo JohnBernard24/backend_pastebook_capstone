@@ -108,6 +108,8 @@ namespace backend_pastebook_capstone
 			
 			app.UseCors("AllowAllOrigins");
 
+			//app.UseStaticFiles();
+
 			/*app.UseStaticFiles(new StaticFileOptions
 			{
 				FileProvider = new PhysicalFileProvider(

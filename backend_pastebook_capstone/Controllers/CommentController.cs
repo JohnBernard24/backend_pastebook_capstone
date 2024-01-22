@@ -53,15 +53,20 @@ namespace backend_pastebook_capstone.Controllers
 
 			_commentRepository.AddComment(comment);
 
-			Notification commentNotif = new Notification
-			{
-				NotificationType = "comment",
-				NotifiedUserId = comment.Post.PosterId,
-				NotifiedUser = comment.Post.Poster,
-				ContextId = comment.Id
-			};
 
-			_notificationRepository.AddNotification(commentNotif);
+            if (post.Timeline?.UserId != comment.CommenterId)
+			{
+                Notification commentNotif = new Notification
+                {
+                    NotificationType = "comment",
+                    NotifiedUserId = comment.Post.PosterId,
+                    NotifiedUser = comment.Post.Poster,
+                    ContextId = comment.Id
+                };
+
+                _notificationRepository.AddNotification(commentNotif);
+            }
+
 
 			return Ok(comment.Id);
 		}

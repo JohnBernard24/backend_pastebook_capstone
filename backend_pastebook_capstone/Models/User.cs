@@ -19,7 +19,7 @@ namespace backend_pastebook_capstone.Models
 		public string? AboutMe { get; set; }
 
 
-		public Guid? ProfileImageId { get; set; }
+		public Guid? PhotoId { get; set; }
 		public Photo? Photo { get; set; }
 	}
 
