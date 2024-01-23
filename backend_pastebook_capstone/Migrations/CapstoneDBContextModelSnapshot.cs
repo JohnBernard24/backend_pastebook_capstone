@@ -271,9 +271,6 @@ namespace backend_pastebook_capstone.Migrations
                     b.Property<Guid?>("PhotoId")
                         .HasColumnType("char(36)");
 
-                    b.Property<Guid?>("ProfileImageId")
-                        .HasColumnType("char(36)");
-
                     b.Property<string>("Sex")
                         .HasColumnType("longtext");
 
@@ -282,6 +279,25 @@ namespace backend_pastebook_capstone.Migrations
                     b.HasIndex("PhotoId");
 
                     b.ToTable("User");
+                });
+
+            modelBuilder.Entity("backend_pastebook_capstone.Models.Verification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("VerificationCode")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Verification");
                 });
 
             modelBuilder.Entity("backend_pastebook_capstone.Models.Album", b =>

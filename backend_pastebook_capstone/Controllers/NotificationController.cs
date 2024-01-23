@@ -60,38 +60,39 @@ namespace backend_pastebook_capstone.Controllers
 			return notificationDTOs;
 		}
 
-		[HttpGet("get-notification-context/{notificationId}")]
-		public IActionResult GetNotificationContext(Guid notificationId)
-		{
-			string? token = Request.Headers["Authorization"];
-			if (token == null || _userRepository.GetUserByToken(token) == null)
-				return BadRequest(new { result = "no_token_sent" });
+        [HttpGet("get-notification-context/{notificationId}")]
+        public IActionResult GetNotificationContext(Guid notificationId)
+        {
+            string? token = Request.Headers["Authorization"];
+            if (token == null || _userRepository.GetUserByToken(token) == null)
+                return BadRequest(new { result = "no_token_sent" });
 
-			Notification? notification = _notificationRepository.GetNotificationByNotificationId(notificationId);
-			if (notification == null)
-				return NotFound(new { result = "no_notification_found" });
+            Notification? notification = _notificationRepository.GetNotificationByNotificationId(notificationId);
+            if (notification == null)
+                return NotFound(new { result = "no_notification_found" });
 
-			switch (notification.NotificationType)
-			{
-				case "like":
-					Like? like = _notificationRepository.GetLikeByContextId(notification.ContextId);
-					return SerializeAndReturn(like);
+            switch (notification.NotificationType)
+            {
+                case "like":
+                    Like? like = _notificationRepository.GetLikeByContextId(notification.ContextId);
+                    return Ok(like); // Directly return serialized data
 
-				case "comment":
-					Comment? comment = _notificationRepository.GetCommentByContextId(notification.ContextId);
-					return SerializeAndReturn(comment);
+                case "comment":
+                    Comment? comment = _notificationRepository.GetCommentByContextId(notification.ContextId);
+                    return Ok(comment); // Directly return serialized data
 
-				case "add-friend-request":
-				case "accept-friend-request":
-					Friend? friend = _notificationRepository.GetSentFriendRequestByContextId(notification.ContextId);
-					return SerializeAndReturn(friend);
+                case "add-friend-request":
+                case "accept-friend-request":
+                    Friend? friend = _notificationRepository.GetSentFriendRequestByContextId(notification.ContextId);
+                    return Ok(friend); // Directly return serialized data
 
-				default:
-					return BadRequest(new { result = "notification_type_invalid" });
-			}
-		}
+                default:
+                    return BadRequest(new { result = "notification_type_invalid" });
+            }
+        }
 
-		[HttpPut("update-notification-read/{notificationId}")]
+
+        [HttpPut("update-notification-read/{notificationId}")]
 		public IActionResult UpdateNotificationRead(Guid notificationId)
 		{
 			string? token = Request.Headers["Authorization"];

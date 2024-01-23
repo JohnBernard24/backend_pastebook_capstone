@@ -23,8 +23,10 @@ namespace backend_pastebook_capstone.Controllers
 		private readonly UserRepository _userRepository;
 		private readonly TimelineRepository _timelineRepository;
 		private readonly AlbumRepository _albumRepository;
+		private readonly VerificationRepository _verificationRepository;
+		private readonly PhotoRepository _photoRepository;
 
-		public AuthenticationController(UserRepository userRepository, BcryptPasswordHasher passwordHasher, Authenticator authenticator, TimelineRepository timelineRepository, AlbumRepository albumRepository, AccessTokenRepository accessTokenRepository)
+		public AuthenticationController(UserRepository userRepository, BcryptPasswordHasher passwordHasher, Authenticator authenticator, TimelineRepository timelineRepository, AlbumRepository albumRepository, AccessTokenRepository accessTokenRepository, VerificationRepository verificationRepository, PhotoRepository photoRepository)
 		{
 			_passwordHasher = passwordHasher;
 			_authenticator = authenticator;
@@ -33,6 +35,8 @@ namespace backend_pastebook_capstone.Controllers
 			_timelineRepository = timelineRepository;
 			_albumRepository = albumRepository;
 			_accessTokenRepository = accessTokenRepository;
+			_verificationRepository = verificationRepository;
+			_photoRepository = photoRepository;
 		}
 
 
@@ -41,19 +45,19 @@ namespace backend_pastebook_capstone.Controllers
 		{
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(new { result = "invalid_user_login" });
+				return BadRequest(new { result = "Invalid user login" });
 			}
 
 			User? user = _userRepository.GetUserByEmail(userLoginDTO.Email);
-			if(user == null)
+			if (user == null)
 			{
-				return Unauthorized(new { result = "no_user_found" });
+				return Unauthorized(new { result = "Could not find account!" });
 			}
 
 			bool isCorrectPassword = _passwordHasher.VerifyPassword(userLoginDTO.Password, user.HashedPassword);
 			if (!isCorrectPassword)
 			{
-				return Unauthorized(new { result = "invalid_credentials" });
+				return Unauthorized(new { result = "Invalid credentials!" });
 			}
 
 			string token = _authenticator.Authenticate(user);
@@ -69,56 +73,99 @@ namespace backend_pastebook_capstone.Controllers
 			return Ok(loginResponse);
 		}
 
-		[HttpPost("register")]
-		public IActionResult Register([FromBody] UserRegisterDTO userRegisterDTO)
-		{
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(new { result = "invalid_user_registration" });
-			}
+        [HttpPost("register")]
+        public IActionResult Register([FromBody] UserRegisterDTO userRegisterDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { result = "Invalid user registration" });
+            }
 
-			User? existingUser = _userRepository.GetUserByEmail(userRegisterDTO.Email);
-			if(existingUser != null)
-			{
-				return Conflict(new { result = "email_already_exits" });
-			}
+            User? existingUser = _userRepository.GetUserByEmail(userRegisterDTO.Email);
+            if (existingUser != null)
+            {
+                return Conflict(new { result = "Email Already Exists!" });
+            }
 
-			User user = new User
-			{
-				FirstName = userRegisterDTO.FirstName,
-				LastName = userRegisterDTO.LastName,
-				Email = userRegisterDTO.Email,
-				HashedPassword = _passwordHasher.HashPassword(userRegisterDTO.Password),
-				BirthDate = userRegisterDTO.BirthDate,
-				Sex = userRegisterDTO.Sex,
-				PhoneNumber = userRegisterDTO.PhoneNumber
-			};
+            User user = new User
+            {
+                FirstName = userRegisterDTO.FirstName,
+                LastName = userRegisterDTO.LastName,
+                Email = userRegisterDTO.Email,
+                HashedPassword = _passwordHasher.HashPassword(userRegisterDTO.Password),
+                BirthDate = userRegisterDTO.BirthDate,
+                Sex = userRegisterDTO.Sex,
+                PhoneNumber = userRegisterDTO.PhoneNumber
+            };
 
-			Timeline timeline = new Timeline
-			{
-				UserId = user.Id,
-				User = user
-			};
+            Timeline timeline = new Timeline
+            {
+                UserId = user.Id,
+                User = user
+            };
 
-			Album album = new Album
-			{
-				AlbumName = "Uploads",
-				UserId = user.Id,
-				User = user
-			};
+            Album album = new Album
+            {
+                AlbumName = "Uploads",
+                UserId = user.Id,
+                User = user
+            };
 
-			_userRepository.AddUser(user);
-			_timelineRepository.AddTimeline(timeline);
-			_albumRepository.AddAlbum(album);
+            _userRepository.AddUser(user);
+            _timelineRepository.AddTimeline(timeline);
+            _albumRepository.AddAlbum(album);
 
-			return Ok(new { result = "user_registered_successfully" });
-		}
+            string fileName;
+            if (userRegisterDTO.Sex == "Male")
+            {
+                fileName = "sample_avatar_male.png";
+            }
+            else if (userRegisterDTO.Sex == "Female")
+            {
+                fileName = "sample_avatar_female.png";
+            }
+            else
+            {
+                fileName = "sample_avatar_neutral.png";
+            }
 
-		[HttpPost("logout")]
+            string wwwrootPath = "wwwroot";
+            string sourceFilePath = Path.Combine(wwwrootPath, fileName);
+
+            string uniqueFileName = Guid.NewGuid().ToString() + "_" + fileName;
+            string uploadsFolder = Path.Combine("..", "..", "PastebookData", "photos", album.Id.ToString());
+            string destinationFilePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            System.IO.File.Copy(sourceFilePath, destinationFilePath, true);
+
+            string imageUrl = $"photos/{album.Id}/{uniqueFileName}";
+
+            Photo photo = new Photo
+            {
+                PhotoImageURL = imageUrl,
+                AlbumId = album.Id,
+                Album = album
+            };
+
+            user.PhotoId = photo.Id;
+            user.Photo = photo;
+
+            _photoRepository.AddPhoto(photo);
+
+            return Ok(new { result = "User Registered Successfully" });
+        }
+
+
+        [HttpPost("logout")]
 		public IActionResult logout()
 		{
 			string? token = Request.Headers["Authorization"];
-			if(token == null)
+			if (token == null)
 			{
 				return BadRequest(new { result = "no_valid_token_sent" });
 			}
@@ -132,112 +179,113 @@ namespace backend_pastebook_capstone.Controllers
 			return Ok(new { result = "logout successfully" });
 		}
 
-		[HttpGet("validate-token")]
-		public ActionResult<bool> Validate()
-		{
-			string? token = Request.Headers["Authorization"];
-			if(token == null || _userRepository.GetUserByToken(token) == null)
+        [HttpGet("validate-token")]
+        public ActionResult<bool> Validate()
+        {
+            string? token = Request.Headers["Authorization"];
+
+            if (token == null)
+            {
+                return BadRequest(new { result = "no_valid_token_sent" });
+            }
+
+			User? user = _userRepository.GetUserByToken(token);
+
+			if (user == null)
 			{
-				return BadRequest(new { result = "no_valid_token_sent" });
+				return Unauthorized(new { result = "no_user_found" });
 			}
-			return Ok(_authenticator.Validate(token));
-		}
 
-		[HttpPost("verify-email/{recipientEmail}")]
-		public IActionResult SendEmail(string recipientEmail)
+			bool isValid = _authenticator.Validate(token);
+
+            if (isValid)
+            {
+                return Ok(true);
+            }
+            else
+            {
+                return Unauthorized(new { result = "invalid_token" });
+            }
+        }
+
+
+		[HttpPost("verify-email-forgot/{recipientEmail}")]
+		public IActionResult SendEmailForgot(string recipientEmail)
 		{
-			var senderEmail = "teametivacpastebook@gmail.com";
-			var senderPassword = "nbci cmzt wqds krbv";
-
 			User? user = _userRepository.GetUserByEmail(recipientEmail);
 			if (user == null)
-				return BadRequest(new { result = "no_account_with_that_email" });
+				return BadRequest(new { result = "Account does not exist" });
 
-			var message = new MailMessage(senderEmail, recipientEmail)
+			bool result = _verificationRepository.SendVerificationEmail(recipientEmail);
+
+			if (result)
 			{
-				Subject = $"Verify your email, {user.Email}!",
-				IsBodyHtml = true,
-				Body =
-				$@"
-					<html>
-					<head>
-					<title>Pastebook Email Confirmation</title>
-					<style>
-					body {{
-					  font-family: sans-serif;
-					  margin: 0;
-					  padding: 0;
-					}}
-
-					.container {{
-					  width: 600px;
-					  margin: 0 auto;
-					}}
-
-					h1 {{
-					  text-align: center;
-					  font-size: 30px;
-					  margin-top: 40px;
-					}}
-
-					p {{
-					  font-size: 16px;
-					  line-height: 1.5;
-					}}
-
-					a {{
-					  color: #fff;
-					  background-color: #f9a113;
-					  padding: 10px 20px;
-					  border-radius: 4px;
-					  text-decoration: none;
-					}}
-
-					.footer {{
-					  text-align: center;
-					  font-size: 12px;
-					  margin-top: 40px;
-					}}
-					</style>
-					</head>
-					<body>
-					  <div class=""container"">
-						<img style='width: 100;' src = 'https://cdn.discordapp.com/attachments/1174240282951303239/1176866765209337886/Logo1_dark.PNG?ex=65706d95&is=655df895&hm=62cdfca8d61e6fd565803260716f0493e37f4d764e82c5b5d8e11f9e861783e3&' alt = 'Pastebook Logo'>
-						<h1>Email Confirmation</h1>
-						<p>
-						  Hey {user.FirstName + " " + user.LastName}, you're almost ready!
-						</p>
-						<p>
-						  Simply click the big button below to verify your email address.
-						</p>
-						<a href=""http://localhost:4200/forgot-password/{user.Id}"" style=""display:inline-block;padding:10px 20px;background-color:#007BFF;color:#ffffff;text-decoration:none;border-radius:5px;"">Confirm Email</a>
-						<div class=""footer"">
-						  Copyright © 2023 Team Etivac. All rights reserved. Email sent by Pastebook.com.
-						</div>
-					  </div>
-					</body>
-					</html>
-				"
-			};
-
-			var smtpClient = new SmtpClient("smtp.gmail.com")
-			{
-				Port = 587,
-				Credentials = new NetworkCredential(senderEmail, senderPassword),
-				EnableSsl = true,
-			};
-
-			try
-			{
-				smtpClient.SendMailAsync(message);
 				return Ok(new { result = "Email sent successfully!" });
 			}
-			catch (Exception)
+			else
 			{
 				return BadRequest(new { result = "Error sending email." });
+            }
+		}
+
+        [HttpPost("verify-email-new-user/{recipientEmail}")]
+        public IActionResult SendNewUserEmail(string recipientEmail)
+        {
+            bool result = _verificationRepository.SendVerificationEmail(recipientEmail);
+
+            if (result)
+            {
+				return Ok(new { result = "Email sent successfully!" });
+            }
+            else
+            {
+				return BadRequest(new { result = "Error sending email." });
+            }
+        }
+        
+
+        [HttpPost("verify-code")]	
+		public ActionResult<bool> VerifyCode([FromBody] VerificationDTO verificationDTO)
+		{
+			Verification? verification = _verificationRepository.GetVerificationByEmail(verificationDTO.Email);
+			if(verification == null)
+			{
+				return BadRequest(new { result = "No Verification with that email" });
+			}
+
+			return verificationDTO.VerificationCode == verification.VerificationCode;
+		}
+
+		[HttpPost("check-email-availability/{email}")]
+		public ActionResult<bool> CheckEmail(string email)
+		{
+			User? user = _userRepository.GetUserByEmail(email);
+			if (user == null)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
 			}
 		}
 
+        [HttpPut("forgot-change-password")]
+        public IActionResult EditPassword([FromBody] ForgotPasswordDTO forgotPasswordDTO)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new { result = "invalid_user" });
 
-	}
+            User? existingUser = _userRepository.GetUserByEmail(forgotPasswordDTO.Email);
+            if (existingUser == null)
+                return NotFound(new { result = "user_not_found" });
+
+
+            existingUser.HashedPassword = _passwordHasher.HashPassword(forgotPasswordDTO.NewPassword);
+
+            _userRepository.UpdateUser(existingUser);
+
+            return Ok(new {result = "password_changed_successfully"});
+        }
+    }
 }

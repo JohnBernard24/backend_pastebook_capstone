@@ -19,7 +19,7 @@ namespace backend_pastebook_capstone.Models
 		public string? AboutMe { get; set; }
 
 
-		public Guid? ProfileImageId { get; set; }
+		public Guid? PhotoId { get; set; }
 		public Photo? Photo { get; set; }
 	}
 
@@ -92,6 +92,12 @@ namespace backend_pastebook_capstone.Models
 		public string CurrentPassword { get; set; } = null!;
 		public string NewPassword { get; set; } = null!;
 	}
+
+    public class ForgotPasswordDTO
+    {
+		public string Email { get; set; } = null!;
+        public string NewPassword { get; set; } = null!;
+    }
 
 
 }

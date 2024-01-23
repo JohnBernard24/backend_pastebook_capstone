@@ -229,15 +229,18 @@ namespace backend_pastebook_capstone.Controllers
 
 				_postRepository.AddLike(like);
 
-				var likeNotif = new Notification
+				if(post.Timeline?.UserId != like.LikerId)
 				{
-					NotificationType = "like",
-					NotifiedUserId = post.PosterId,
-					NotifiedUser = post.Poster,
-					ContextId = like.Id
-				};
+                    var likeNotif = new Notification
+                    {
+                        NotificationType = "like",
+                        NotifiedUserId = post.PosterId,
+                        NotifiedUser = post.Poster,
+                        ContextId = like.Id
+                    };
 
-				_notificationRepository.AddNotification(likeNotif);
+                    _notificationRepository.AddNotification(likeNotif);
+                }
 
 				return Ok(new { result = "like_added" });
 			}

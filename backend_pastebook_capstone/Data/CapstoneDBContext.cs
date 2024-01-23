@@ -16,9 +16,10 @@ namespace backend_pastebook_capstone.Data
 		public DbSet<Album> Album { get; set; } = default!;
 		public DbSet<Notification> Notification { get; set; } = default!;
 		public DbSet<AccessToken> AccessToken { get; set; } = default!;
+		public DbSet<Verification> Verification { get; set; } = default!;
 
 
-		public CapstoneDBContext(DbContextOptions<CapstoneDBContext> options)
+        public CapstoneDBContext(DbContextOptions<CapstoneDBContext> options)
 			: base(options)
 		{
 		}

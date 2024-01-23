@@ -25,18 +25,17 @@ namespace backend_pastebook_capstone
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen();
 
-			builder.Services.AddCors(options =>
-			{
-				options.AddPolicy("AllowAllOrigins",
-					builder =>
-					{
-						builder.AllowAnyOrigin()
-							   .AllowAnyMethod()
-							   .AllowAnyHeader();
-					});
-			});
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins", builder =>
+                {
+                    builder.AllowAnyOrigin();
+                    builder.AllowAnyHeader();
+                    builder.AllowAnyMethod();
+                });
+            });
 
-			builder.Services.Configure<FormOptions>(options =>
+            builder.Services.Configure<FormOptions>(options =>
 			{
 				options.ValueLengthLimit = int.MaxValue;
 				options.MultipartBodyLengthLimit = 512 * 1024 * 1024;
@@ -65,8 +64,9 @@ namespace backend_pastebook_capstone
 			builder.Services.AddScoped<NotificationRepository>();
 			builder.Services.AddScoped<AlbumRepository>();
 			builder.Services.AddScoped<PhotoRepository>();
+			builder.Services.AddScoped<VerificationRepository>();
 
-			builder.Services.AddScoped<AccessTokenRepository>();
+            builder.Services.AddScoped<AccessTokenRepository>();
 			builder.Services.AddScoped<TokenGenerator>();
 			builder.Services.AddScoped<AccessTokenGenerator>();
 			builder.Services.AddScoped<TokenGenerator>();
@@ -107,6 +107,8 @@ namespace backend_pastebook_capstone
 			app.UseHttpsRedirection();
 			
 			app.UseCors("AllowAllOrigins");
+
+			//app.UseStaticFiles();
 
 			/*app.UseStaticFiles(new StaticFileOptions
 			{
