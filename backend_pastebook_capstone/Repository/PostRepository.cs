@@ -29,8 +29,18 @@ namespace backend_pastebook_capstone.Repository
 				.ToList();
 		}
 
+        public int GetPostCountByUserId(Guid userId)
+        {
+            var postCount = _context.Post
+                .Where(p => (p.PosterId == userId || p.Timeline!.UserId == userId))
+                .Distinct()
+                .Count();
 
-		public Like? GetLikeByLikeId(Guid likeId)
+            return postCount;
+        }
+
+
+        public Like? GetLikeByLikeId(Guid likeId)
 		{
 			return _context.Like.FirstOrDefault(l => l.Id == likeId);
 		}

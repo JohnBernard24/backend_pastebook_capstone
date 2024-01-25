@@ -14,13 +14,17 @@ namespace backend_pastebook_capstone.Controllers
 		private readonly BcryptPasswordHasher _passwordHasher;
 		private readonly FriendRepository _friendRepository;
 		private readonly PhotoRepository _photoRepository;
+		private readonly AlbumRepository _albumRepository;
+		private readonly PostRepository _postRepository;
 
-		public UserController(UserRepository userRepository, BcryptPasswordHasher passwordHasher, FriendRepository friendRepository, PhotoRepository photoRepository)
+		public UserController(UserRepository userRepository, BcryptPasswordHasher passwordHasher, FriendRepository friendRepository, PhotoRepository photoRepository, AlbumRepository albumRepository, PostRepository postRepository)
 		{
 			_userRepository = userRepository;
 			_passwordHasher = passwordHasher;
 			_friendRepository = friendRepository;
 			_photoRepository = photoRepository;
+			_albumRepository = albumRepository;
+			_postRepository = postRepository;
 		}
 
 
@@ -74,14 +78,22 @@ namespace backend_pastebook_capstone.Controllers
 				return BadRequest(new { result = "user_not_found" });
 
 			int friendCount = _friendRepository.GetFriendCountByUserId(checkingForUser.Id);
+			int albumCount = _albumRepository.GetAlbumCountByUserId(checkingForUser.Id);
+			int postCount = _postRepository.GetPostCountByUserId(checkingForUser.Id);
 
 			var miniProfile = new MiniProfileDTO
 			{
 				Id = checkingForUser.Id,
 				FirstName = checkingForUser.FirstName,
 				LastName = checkingForUser.LastName,
-				Photo = checkingForUser.Photo,
-				FriendCount = friendCount
+                BirthDate = checkingForUser.BirthDate,
+                Sex = checkingForUser.Sex,
+                PhoneNumber = checkingForUser.PhoneNumber,
+                AboutMe = checkingForUser.AboutMe,
+                Photo = checkingForUser.Photo,
+				FriendCount = friendCount,
+				AlbumCount = albumCount,
+				PostCount = postCount,
 			};
 
 			return Ok(miniProfile);

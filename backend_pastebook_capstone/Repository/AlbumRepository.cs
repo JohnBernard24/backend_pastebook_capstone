@@ -35,8 +35,18 @@ namespace backend_pastebook_capstone.Repository
 		{
 			return _context.Album.FirstOrDefault(a => a.AlbumName == "Uploads" && a.UserId == userId);
 		}
+        public int GetAlbumCountByUserId(Guid userId)
+        {
+            var albumCount = _context.Album
+                .Where(a => a.UserId == userId)
+                .Distinct()
+                .Count();
 
-		public void AddAlbum(Album album)
+            return albumCount;
+        }
+
+
+        public void AddAlbum(Album album)
 		{
 			_context.Album.Add(album);
 			_context.SaveChanges();

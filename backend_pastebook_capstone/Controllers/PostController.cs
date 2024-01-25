@@ -31,19 +31,19 @@ namespace backend_pastebook_capstone.Controllers
 
 			if (token == null || _userRepository.GetUserByToken(token) == null)
 			{
-				return BadRequest(new { result = "no_valid_token_sent" });
+				return BadRequest(new { result = "No valid token sent!" });
 			}
 
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(new { result = "invalid_post" });
+				return BadRequest(new { result = "Invalid Post" });
 			}
 
 			//This gets the poster via its token bc the one logged in is the one who posted
 			User? poster = _userRepository.GetUserByToken(token);
 			if(poster == null)
 			{
-				return BadRequest(new { result = "invalid_user_id" });
+				return BadRequest(new { result = "Invalid User Id" });
 			}
 
 
@@ -59,7 +59,7 @@ namespace backend_pastebook_capstone.Controllers
 			}
 
 			if (timeline == null)
-				return BadRequest(new { result = "user_not_found" });
+				return BadRequest(new { result = "User Not Found" });
 
 			Photo? photo = _photoRepository.GetPhotoByPhotoId(postDTO.PhotoId);
 			Post post = new Post

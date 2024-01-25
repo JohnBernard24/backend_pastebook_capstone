@@ -15,7 +15,7 @@ namespace backend_pastebook_capstone.Models
 	public class PhotoDTO
 	{
 		public Guid Id { get; set; }
-		public string PhotoImageURL { get; set; } = null!;
+        public string PhotoImageURL { get; set; } = null!;
 		public DateTime UploadDate { get; set; } = DateTime.Now;
 		public Guid AlbumId { get; set; }
 	}

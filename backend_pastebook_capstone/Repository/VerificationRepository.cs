@@ -68,7 +68,7 @@ namespace backend_pastebook_capstone.Repository
                         justify-content: center
 					}}
 
-					h1 {{
+					h1, h2, h3 {{
 					  text-align: center;
 					  font-size: 30px;
 					  margin-top: 40px;
@@ -99,12 +99,12 @@ namespace backend_pastebook_capstone.Repository
 						<img style='width: 100;' src = 'https://cdn.discordapp.com/attachments/1174240282951303239/1176866765209337886/Logo1_dark.PNG?ex=65706d95&is=655df895&hm=62cdfca8d61e6fd565803260716f0493e37f4d764e82c5b5d8e11f9e861783e3&' alt = 'Pastebook Logo'>
 						<h1>Email Confirmation</h1>
 						
-						<p>
+						<h3>
 						  Simply input the code below to verify.
-						</p>
-						<strong>
+						</h3>
+						<h1>
 						  {word}
-						</strong>
+						</h1>
 						<div class=""footer"">
 						  Copyright © 2023 Team Etivac. All rights reserved. Email sent by Pastebook.com.
 						</div>
