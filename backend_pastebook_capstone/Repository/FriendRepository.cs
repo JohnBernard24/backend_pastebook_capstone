@@ -23,7 +23,7 @@ namespace backend_pastebook_capstone.Repository
 				.ToList();
 
 			List<User>? friends = _context.User
-				.Where(u => friendIds.Contains(u.Id))
+				.Where(u => friendIds.Contains(u.Id)).Include(u => u.Photo)
 				.ToList();
 
 			return friends;

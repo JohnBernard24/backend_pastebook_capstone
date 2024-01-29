@@ -6,7 +6,7 @@ namespace backend_pastebook_capstone.Models
 	{
 		public Guid Id { get; set; }
 		public string PhotoImageURL { get; set; } = null!;
-		public DateTime UploadDate { get; set; } = DateTime.Now;
+		public DateTime UploadDate { get; set; } = DateTime.UtcNow;
 
 		public Guid AlbumId { get; set; }
 		public Album? Album { get; set; }
@@ -16,7 +16,7 @@ namespace backend_pastebook_capstone.Models
 	{
 		public Guid Id { get; set; }
         public string PhotoImageURL { get; set; } = null!;
-		public DateTime UploadDate { get; set; } = DateTime.Now;
+		public DateTime UploadDate { get; set; } = DateTime.UtcNow;
 		public Guid AlbumId { get; set; }
 	}
 

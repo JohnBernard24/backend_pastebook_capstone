@@ -7,7 +7,7 @@
 		public User? NotifiedUser { get; set; }
 		public string NotificationType { get; set; } = null!;
 
-		public DateTime NotifiedDate { get; set; } = DateTime.Now;
+		public DateTime NotifiedDate { get; set; } = DateTime.UtcNow;
 
 		public Guid ContextId { get; set; }
 		public bool IsRead { get; set; } = false;
@@ -19,7 +19,8 @@
 		public Guid NotifiedUserId { get; set; }
 		public MiniProfileDTO? NotifiedUser { get; set; }
 		public string NotificationType { get; set; } = null!;
-		public Guid ContextId { get; set; }
+        public DateTime NotifiedDate { get; set; }
+        public Guid ContextId { get; set; }
 		public bool IsRead { get; set; }
 
 	}

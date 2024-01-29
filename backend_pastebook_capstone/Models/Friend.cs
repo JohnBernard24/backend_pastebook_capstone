@@ -18,6 +18,6 @@ namespace backend_pastebook_capstone.Models
 		public Guid? Id { get; set; }
 		public Guid ReceiverId { get; set; }
 		public Guid SenderId { get; set; }
-		public DateTime? FriendshipDate { get; set; } = DateTime.Now;
+		public DateTime? FriendshipDate { get; set; } = DateTime.UtcNow;
 	}
 }

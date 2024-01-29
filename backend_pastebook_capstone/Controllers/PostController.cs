@@ -165,7 +165,12 @@ namespace backend_pastebook_capstone.Controllers
 			{
 				return BadRequest(new { result = "no_valid_token_sent" });
 			}
-			List<Like> likes = _postRepository.GetLikeListByPostId(postId);
+
+            Post? post = _postRepository.GetPostByPostId(postId);
+            if (post == null)
+                return BadRequest(new { result = "invalid_post_id" });
+
+            List<Like> likes = _postRepository.GetLikeListByPostId(postId);
 
 			if(likes == null)
 			{
@@ -196,7 +201,27 @@ namespace backend_pastebook_capstone.Controllers
 			return Ok(users);
 		}
 
-		[HttpPost("like-post")]
+        [HttpGet("get-post-likes-count/{postId}")]
+        public IActionResult GetPostLikesCountByPostId(Guid postId)
+        {
+            string? token = Request.Headers["Authorization"];
+
+            if (token == null || _userRepository.GetUserByToken(token) == null)
+            {
+                return BadRequest(new { result = "no_valid_token_sent" });
+            }
+
+            Post? post = _postRepository.GetPostByPostId(postId);
+            if (post == null)
+                return BadRequest(new { result = "invalid_post_id" });
+
+            int likes = _postRepository.GetLikeCountByPostId(postId);
+
+            return Ok(likes);
+        }
+
+
+        [HttpPost("like-post")]
 		public IActionResult LikePost([FromBody] LikeDTO likeDTO)
 		{
 			string? token = Request.Headers["Authorization"];

@@ -20,7 +20,7 @@ namespace backend_pastebook_capstone.Repository
 		{
 			return _context.User.FirstOrDefault(x => x.Id == id);
 		}
-		public User? GetUserByEmail(string email)
+		public User? GetUserByEmail(string email)	
 		{
 			return _context.User.FirstOrDefault(u => u.Email == email);
 		}
