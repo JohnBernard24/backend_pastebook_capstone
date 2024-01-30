@@ -1,4 +1,5 @@
-﻿using backend_pastebook_capstone.Models;
+﻿using backend_pastebook_capstone.AuthenticationService.Repository;
+using backend_pastebook_capstone.Models;
 using backend_pastebook_capstone.Repository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -44,6 +45,7 @@ namespace backend_pastebook_capstone.Controllers
 				{
 					Id = notification.Id,
 					NotifiedUserId = notification.NotifiedUserId,
+					NotifiedDate = notification.NotifiedDate,
 					NotifiedUser = new MiniProfileDTO
 					{
 						Id = notification.NotifiedUser.Id,
@@ -89,6 +91,23 @@ namespace backend_pastebook_capstone.Controllers
                 default:
                     return BadRequest(new { result = "notification_type_invalid" });
             }
+        }
+
+		[HttpDelete("clear-notification")]
+		public IActionResult ClearAllNotifications()
+		{
+            string? token = Request.Headers["Authorization"];
+            if (token == null || _userRepository.GetUserByToken(token) == null)
+                return BadRequest(new { result = "no_token_sent" });
+
+			User? user = _userRepository.GetUserByToken(token);
+			if(user == null)
+			{
+                return BadRequest(new { result = "no_user_found" });
+			}
+
+            _notificationRepository.ClearNotificationByUserId(user.Id);
+            return Ok(new { result = "removed all notification successfully" });
         }
 
 

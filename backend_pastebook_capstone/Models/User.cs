@@ -66,9 +66,15 @@ namespace backend_pastebook_capstone.Models
 		public string FirstName { get; set; } = null!;
 		[Required]
 		public string LastName { get; set; } = null!;
-		public Photo? Photo { get; set; }
+        public Photo? Photo { get; set; }
 		public int? FriendCount { get; set; }
-	}
+		public int? PostCount { get; set; }
+		public int? AlbumCount { get; set; }
+        public DateTime? BirthDate { get; set; }
+        public string? Sex { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? AboutMe { get; set; }
+    }
 
 	public class ProfileDTO
 	{

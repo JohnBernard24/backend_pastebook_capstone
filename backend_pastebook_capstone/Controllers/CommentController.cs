@@ -123,31 +123,34 @@ namespace backend_pastebook_capstone.Controllers
 
 			Post? post = _postRepository.GetPostByPostId(postId);
 			if(post == null)
-				return NotFound(new { result = "invalid_post_id" });
+				return BadRequest(new { result = "invalid_post_id" });
 
 			List<Comment> commentList = _commentRepository.GetCommentListByPostId(post.Id);
 			if(commentList == null)
-				return NotFound(new { result = "no_comments_found" });
+				return BadRequest(new { result = "no_comments_found" });
 
-			/*List<CommentDTO> commentDTOList = new List<CommentDTO>();
-			foreach(Comment comment in commentList)
-			{
-				commentDTOList.Add(new CommentDTO
-				{
-					Id = comment.Id,
-					CommentContent = comment.CommentContent,
-					DateCommented = comment.DateCommented,
-					PostId = comment.PostId,
-					CommenterId = comment.CommenterId
-				});
-			}*/
+			commentList.OrderBy(comment => comment.DateCommented).ToList();
 
-			return Ok(commentList);
+
+            return Ok(commentList);
 		}
 
 
+        [HttpGet("get-post-comments-count/{postId}")]
+        public IActionResult GetCommentsCountByPostId(Guid postId)
+        {
+            string? token = Request.Headers["Authorization"];
+            if (token == null || _userRepository.GetUserByToken(token) == null)
+                return BadRequest(new { result = "no_valid_token_sent" });
 
+            Post? post = _postRepository.GetPostByPostId(postId);
+            if (post == null)
+                return BadRequest(new { result = "invalid_post_id" });
 
+            int commentList = _commentRepository.GetCommentCountByPostId(post.Id);
 
-	}
+            return Ok(commentList);
+        }
+
+    }
 }

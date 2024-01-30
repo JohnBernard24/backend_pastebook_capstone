@@ -133,7 +133,7 @@ namespace backend_pastebook_capstone.Controllers
 
 			List<Photo>? photos = _albumRepository.GetPhotosByAlbumId(album.Id);
 			if (photos == null)
-				return NotFound(new { result = "no_photos_found" });
+				return BadRequest(new { result = "no_photos_found" });
 
 			List<PhotoDTO> photoDTOs = new List<PhotoDTO>();
 			foreach (Photo photo in photos)

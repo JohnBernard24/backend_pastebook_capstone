@@ -18,8 +18,8 @@ namespace backend_pastebook_capstone.AuthenticationService.TokenGenerators
 				issuer,
 				audience,
 				claims,
-				DateTime.Now,
-				DateTime.Now.AddMinutes(expirationMinutes),
+				DateTime.UtcNow,
+				DateTime.UtcNow.AddMinutes(expirationMinutes),
 				credentials
 				);
 			// Generate our token

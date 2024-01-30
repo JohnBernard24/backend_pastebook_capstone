@@ -7,7 +7,7 @@ namespace backend_pastebook_capstone.Models
 		public Guid Id { get; set; }
 		public string PostTitle { get; set; } = null!;
 		public string PostBody { get; set; } = null!;
-		public DateTime DatePosted { get; set; } = DateTime.Now;
+		public DateTime DatePosted { get; set; } = DateTime.UtcNow;
 
 		public Guid TimelineId { get; set; }
 		public Timeline? Timeline { get; set; }
@@ -26,11 +26,10 @@ namespace backend_pastebook_capstone.Models
 
 		[Required]
 		public string PostBody { get; set; } = null!;
-		public DateTime DatePosted { get; set; } = DateTime.Now;
+		public DateTime DatePosted { get; set; } = DateTime.UtcNow;
 
 		public Guid? PhotoId { get; set; }
 		public Guid? UserId { get; set; }
-		public Guid? PosterId { get; set; }
 	}
 
 	

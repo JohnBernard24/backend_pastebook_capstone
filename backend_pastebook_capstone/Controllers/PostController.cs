@@ -31,19 +31,19 @@ namespace backend_pastebook_capstone.Controllers
 
 			if (token == null || _userRepository.GetUserByToken(token) == null)
 			{
-				return BadRequest(new { result = "no_valid_token_sent" });
+				return BadRequest(new { result = "No valid token sent!" });
 			}
 
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(new { result = "invalid_post" });
+				return BadRequest(new { result = "Invalid Post" });
 			}
 
 			//This gets the poster via its token bc the one logged in is the one who posted
 			User? poster = _userRepository.GetUserByToken(token);
 			if(poster == null)
 			{
-				return BadRequest(new { result = "invalid_user_id" });
+				return BadRequest(new { result = "Invalid User Id" });
 			}
 
 
@@ -59,7 +59,7 @@ namespace backend_pastebook_capstone.Controllers
 			}
 
 			if (timeline == null)
-				return BadRequest(new { result = "user_not_found" });
+				return BadRequest(new { result = "User Not Found" });
 
 			Photo? photo = _photoRepository.GetPhotoByPhotoId(postDTO.PhotoId);
 			Post post = new Post
@@ -165,7 +165,12 @@ namespace backend_pastebook_capstone.Controllers
 			{
 				return BadRequest(new { result = "no_valid_token_sent" });
 			}
-			List<Like> likes = _postRepository.GetLikeListByPostId(postId);
+
+            Post? post = _postRepository.GetPostByPostId(postId);
+            if (post == null)
+                return BadRequest(new { result = "invalid_post_id" });
+
+            List<Like> likes = _postRepository.GetLikeListByPostId(postId);
 
 			if(likes == null)
 			{
@@ -196,7 +201,27 @@ namespace backend_pastebook_capstone.Controllers
 			return Ok(users);
 		}
 
-		[HttpPost("like-post")]
+        [HttpGet("get-post-likes-count/{postId}")]
+        public IActionResult GetPostLikesCountByPostId(Guid postId)
+        {
+            string? token = Request.Headers["Authorization"];
+
+            if (token == null || _userRepository.GetUserByToken(token) == null)
+            {
+                return BadRequest(new { result = "no_valid_token_sent" });
+            }
+
+            Post? post = _postRepository.GetPostByPostId(postId);
+            if (post == null)
+                return BadRequest(new { result = "invalid_post_id" });
+
+            int likes = _postRepository.GetLikeCountByPostId(postId);
+
+            return Ok(likes);
+        }
+
+
+        [HttpPost("like-post")]
 		public IActionResult LikePost([FromBody] LikeDTO likeDTO)
 		{
 			string? token = Request.Headers["Authorization"];

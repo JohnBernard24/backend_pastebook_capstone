@@ -83,7 +83,7 @@ namespace backend_pastebook_capstone.Controllers
 				return BadRequest(new { result = "friend_request_already_accepted" });
 
 			friendRequest.IsFriend = true;
-			friendRequest.FriendshipDate = DateTime.Now;
+			friendRequest.FriendshipDate = DateTime.UtcNow;
 
 			_friendRepository.UpdateFriend(friendRequest);
 
@@ -219,5 +219,25 @@ namespace backend_pastebook_capstone.Controllers
 		}
 
 
-	}
+        [HttpGet("is-poster-friend/{userId}")]
+        public ActionResult<bool> IsPosterFriend(Guid userId)
+        {
+            string? token = Request.Headers["Authorization"];
+            if (token == null || _userRepository.GetUserByToken(token) == null)
+                return BadRequest(new { result = "no_valid_token_sent" });
+
+            User? user = _userRepository.GetUserByToken(token);
+            if (user == null)
+            {
+                return BadRequest(new { result = "no_vali_token_sent" });
+            }
+
+            Friend? friend = _friendRepository.FriendExist(user.Id, userId);
+            if (friend == null)
+                return BadRequest(new { result = "friend_not_found" });
+
+            return friend.IsFriend;
+        }
+
+    }
 }

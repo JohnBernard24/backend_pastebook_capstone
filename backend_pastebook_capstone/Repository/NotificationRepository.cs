@@ -1,4 +1,5 @@
-﻿using backend_pastebook_capstone.Data;
+﻿using backend_pastebook_capstone.AuthenticationService.Models;
+using backend_pastebook_capstone.Data;
 using backend_pastebook_capstone.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,26 +33,35 @@ namespace backend_pastebook_capstone.Repository
 
 		public Like? GetLikeByContextId(Guid contextId)
 		{
-			return _context.Like.Include(l => l.Post).Include(l => l.Liker).FirstOrDefault(l => l.Id == contextId);
+			return _context.Like.Include(l => l.Post).Include(l => l.Liker).ThenInclude(l => l!.Photo).FirstOrDefault(l => l.Id == contextId);
 		}
 
 		public Comment? GetCommentByContextId(Guid contextId)
 		{
-			return _context.Comment.Include(c => c.Post).Include(c => c.Commenter).FirstOrDefault(c => c.Id == contextId);
+			return _context.Comment.Include(c => c.Post).Include(c => c.Commenter).ThenInclude(c => c!.Photo).FirstOrDefault(c => c.Id == contextId);
 		}
 
 		public Friend? GetSentFriendRequestByContextId(Guid contextId)
 		{
-			return _context.Friend.Include(f => f.Sender).FirstOrDefault(f => f.Id == contextId);
+			return _context.Friend.Include(f => f.Sender).ThenInclude(f => f!.Photo).Include(f => f.Receiver).ThenInclude(f => f!.Photo).FirstOrDefault(f => f.Id == contextId);
 		}
 
 		// following function is to be used when accessing the notification that says "___ has accepted your friend request
 		public Friend? GetAcceptedFriendRequestByContextId(Guid contextId)
 		{
-			return _context.Friend.Include(f => f.Receiver).FirstOrDefault(f => f.Id == contextId);
+			return _context.Friend.Include(f => f.Receiver).Include(f => f.Sender).FirstOrDefault(f => f.Id == contextId);
 		}
 
-		public void AddNotification(Notification notification)
+		public void ClearNotificationByUserId(Guid userId)
+		{
+            IEnumerable<Notification> notifications = _context.Notification.ToArray().Where(t => t.NotifiedUserId == userId).ToList();
+            
+			_context.Notification.RemoveRange(notifications);
+            _context.SaveChanges();
+        }
+        
+
+        public void AddNotification(Notification notification)
 		{
 			_context.Notification.Add(notification);
 			_context.SaveChanges();

@@ -252,8 +252,11 @@ namespace backend_pastebook_capstone.Controllers
 			{
 				return BadRequest(new { result = "No Verification with that email" });
 			}
+            bool isVerified = verificationDTO.VerificationCode == verification.VerificationCode;
 
-			return verificationDTO.VerificationCode == verification.VerificationCode;
+            _verificationRepository.RemoveVerification(verification);
+
+            return isVerified;
 		}
 
 		[HttpPost("check-email-availability/{email}")]

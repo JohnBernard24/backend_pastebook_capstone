@@ -15,10 +15,15 @@ namespace backend_pastebook_capstone.Repository
 
 		public List<Comment> GetCommentListByPostId(Guid postId)
 		{
-			return _context.Comment.Where(c => c.PostId == postId).ToList();
+			return _context.Comment.Where(c => c.PostId == postId).Include(c => c.Post).ThenInclude(c => c.Poster).ToList();
 		}
 
-		public Comment? GetCommentById(Guid? id)
+        public int GetCommentCountByPostId(Guid postId)
+        {
+            return _context.Comment.Where(c => c.PostId == postId).Count();
+        }
+
+        public Comment? GetCommentById(Guid? id)
 		{
 			return _context.Comment.Include(x => x.Commenter).FirstOrDefault(x => x.Id == id);
 		}

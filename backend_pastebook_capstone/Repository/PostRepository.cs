@@ -15,7 +15,7 @@ namespace backend_pastebook_capstone.Repository
 
 		public Post? GetPostByPostId(Guid? postId)
 		{
-			return _context.Post.Include(p=> p.Poster).Include(p=> p.Photo).FirstOrDefault(p => p.Id == postId);
+			return _context.Post.Include(p=> p.Poster).Include(p=> p.Photo).Include(p => p.Timeline).ThenInclude(p => p.User).FirstOrDefault(p => p.Id == postId);
 		}
 
 		public List<Post> GetPostListByUserId(Guid userId)
@@ -29,8 +29,18 @@ namespace backend_pastebook_capstone.Repository
 				.ToList();
 		}
 
+        public int GetPostCountByUserId(Guid userId)
+        {
+            var postCount = _context.Post
+                .Where(p => (p.PosterId == userId || p.Timeline!.UserId == userId))
+                .Distinct()
+                .Count();
 
-		public Like? GetLikeByLikeId(Guid likeId)
+            return postCount;
+        }
+
+
+        public Like? GetLikeByLikeId(Guid likeId)
 		{
 			return _context.Like.FirstOrDefault(l => l.Id == likeId);
 		}
@@ -50,8 +60,13 @@ namespace backend_pastebook_capstone.Repository
 			return _context.Like.Where(l => l.PostId == postId).ToList();
 		}
 
+        public int GetLikeCountByPostId(Guid postId)
+        {
+            return _context.Like.Where(l => l.PostId == postId).Count();
+        }
 
-		public void AddPost(Post post)
+
+        public void AddPost(Post post)
 		{
 			_context.Post.Add(post);
 			_context.SaveChanges();

@@ -4,7 +4,7 @@
 	{
 		public Guid Id { get; set; }
 		public string CommentContent { get; set; } = null!;
-		public DateTime DateCommented { get; set; } = DateTime.Now;
+		public DateTime DateCommented { get; set; } = DateTime.UtcNow;
 
 		public Guid PostId{ get; set; }
 		public Post? Post { get; set; }
@@ -16,7 +16,7 @@
 	{
 		public Guid? Id { get; set; }
 		public string CommentContent { get; set; } = null!;
-		public DateTime DateCommented { get; set; } = DateTime.Now;
+		public DateTime DateCommented { get; set; } = DateTime.UtcNow;
 
 		public Guid PostId { get; set; }
 
